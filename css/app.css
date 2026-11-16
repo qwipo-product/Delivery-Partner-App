@@ -21,6 +21,7 @@
   font-family: "Roboto", sans-serif;
   font-size: 14px;
   line-height: 1.327;               /* Android TextView with includeFontPadding: Roboto yMax..yMin */
+  --lh: 16.381px; --lpt: 1.905px; --lpb: 0.381px;   /* 14 sp: 49 px per single line */
   color: #757575;                       /* Android default TextView colour (measured) */
   background: #fff;                     /* page background behind un-styled areas (measured white) */
   -webkit-font-smoothing: antialiased;
@@ -59,8 +60,15 @@
 .items-center { align-items: center; }
 .relative { position: relative; }
 
-/* Label: single line + ellipsis unless textWrap="true" */
-.lbl { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Label: single line + ellipsis unless textWrap="true".
+   Android lays text out in whole device pixels (2.625 px per dp): line pitch = descent - ascent,
+   plus font padding (top - ascent above the first line, bottom - descent below the last).
+   --lh / --lpt / --lpb are those values for each text size (Roboto metrics, Skia rounding). */
+.lbl { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: var(--lh); }
+.lbl::before { content: ""; display: block; height: var(--lpt); }
+.lbl::after { content: ""; display: block; height: var(--lpb); }
+.lbl.vmid::before, .lbl.vmid::after, .lbl.fas::before, .lbl.fas::after, .lbl.back-arrow::before, .lbl.back-arrow::after { display: none; }
+.lbl.fas, .lbl.back-arrow { line-height: calc(1.031em + 1.46px); }   /* Font Awesome line: fitted at 24 sp and 50 sp */
 /* a Label stretched inside a horizontal StackLayout draws its text vertically centred */
 .row > .lbl:not(.ay-t):not(.ay-b) { align-self: center; }
 .wrap { white-space: normal; overflow-wrap: anywhere; }
@@ -76,23 +84,32 @@
 .w40p { width: 40%; } .w48p { width: 48%; } .w50p { width: 50%; } .w60p { width: 60%; } .w65p { width: 65%; }
 .w70p { width: 70%; } .w75p { width: 75%; } .w80p { width: 80%; } .w85p { width: 85%; } .w98p { width: 98%; }
 
-/* ---------- spacing (tailwind scale; unitless NS values = dp) ---------- */
-.p-1 { padding: 4px; } .p-2 { padding: 8px; } .p-3 { padding: 12px; } .p-4 { padding: 16px; } .p-5 { padding: 20px; }
-.px-2 { padding-left: 8px; padding-right: 8px; } .px-3 { padding-left: 12px; padding-right: 12px; } .px-4 { padding-left: 16px; padding-right: 16px; } .px-5 { padding-left: 20px; padding-right: 20px; } .px-6 { padding-left: 24px; padding-right: 24px; }
-.py-1 { padding-top: 4px; padding-bottom: 4px; }
-.pt-1 { padding-top: 4px; } .pt-2 { padding-top: 8px; } .pt-3 { padding-top: 12px; } .pt-5 { padding-top: 20px; } .pt-10 { padding-top: 40px; }
-.pb-1 { padding-bottom: 4px; } .pb-2 { padding-bottom: 8px; } .pb-4 { padding-bottom: 16px; } .pb-5 { padding-bottom: 20px; } .pb-10 { padding-bottom: 40px; }
-.pl-1 { padding-left: 4px; } .pl-2 { padding-left: 8px; } .pl-3 { padding-left: 12px; } .pl-4 { padding-left: 16px; } .pl-5 { padding-left: 20px; } .pl-20 { padding-left: 80px; }
-.pr-1 { padding-right: 4px; } .pr-2 { padding-right: 8px; }
-.m-2 { margin: 8px; } .m-5 { margin: 20px; } .mx-2 { margin-left: 8px; margin-right: 8px; } .mx-5 { margin-left: 20px; margin-right: 20px; }
-.mt-1 { margin-top: 4px; } .mt-2 { margin-top: 8px; } .mt-4 { margin-top: 16px; } .mt-5 { margin-top: 20px; } .mt-10 { margin-top: 40px; } .mt-20 { margin-top: 80px; }
-.mb-1 { margin-bottom: 4px; } .mb-2 { margin-bottom: 8px; } .mb-30 { margin-bottom: 30px; }
-.ml-1 { margin-left: 4px; } .ml-2 { margin-left: 8px; } .ml-4 { margin-left: 16px; } .ml-5 { margin-left: 20px; }
-.mr-1 { margin-right: 4px; } .mr-2 { margin-right: 8px; } .mr-3 { margin-right: 12px; } .mr-5 { margin-right: 20px; }
+/* ---------- spacing (tailwind scale; unitless NS values = dp, rounded to whole device px:
+   4 dp = 11 px = 4.19, 12 dp = 32 px = 12.19, 20 dp = 53 px = 20.19, 30 dp = 79 px = 30.1) ---------- */
+.p-1 { padding: 4.19px; } .p-2 { padding: 8px; } .p-3 { padding: 12.19px; } .p-4 { padding: 16px; } .p-5 { padding: 20.19px; }
+.px-2 { padding-left: 8px; padding-right: 8px; } .px-3 { padding-left: 12.19px; padding-right: 12.19px; } .px-4 { padding-left: 16px; padding-right: 16px; } .px-5 { padding-left: 20.19px; padding-right: 20.19px; } .px-6 { padding-left: 24px; padding-right: 24px; }
+.py-1 { padding-top: 4.19px; padding-bottom: 4.19px; }
+.pt-1 { padding-top: 4.19px; } .pt-2 { padding-top: 8px; } .pt-3 { padding-top: 12.19px; } .pt-5 { padding-top: 20.19px; } .pt-10 { padding-top: 40px; }
+.pb-1 { padding-bottom: 4.19px; } .pb-2 { padding-bottom: 8px; } .pb-4 { padding-bottom: 16px; } .pb-5 { padding-bottom: 20.19px; } .pb-10 { padding-bottom: 40px; }
+.pl-1 { padding-left: 4.19px; } .pl-2 { padding-left: 8px; } .pl-3 { padding-left: 12.19px; } .pl-4 { padding-left: 16px; } .pl-5 { padding-left: 20.19px; } .pl-20 { padding-left: 80px; }
+.pr-1 { padding-right: 4.19px; } .pr-2 { padding-right: 8px; }
+.m-2 { margin: 8px; } .m-5 { margin: 20.19px; } .mx-2 { margin-left: 8px; margin-right: 8px; } .mx-5 { margin-left: 20.19px; margin-right: 20.19px; }
+.mt-1 { margin-top: 4.19px; } .mt-2 { margin-top: 8px; } .mt-4 { margin-top: 16px; } .mt-5 { margin-top: 20.19px; } .mt-10 { margin-top: 40px; } .mt-20 { margin-top: 80px; }
+.mb-1 { margin-bottom: 4.19px; } .mb-2 { margin-bottom: 8px; } .mb-30 { margin-bottom: 30.1px; }
+.ml-1 { margin-left: 4.19px; } .ml-2 { margin-left: 8px; } .ml-4 { margin-left: 16px; } .ml-5 { margin-left: 20.19px; }
+.mr-1 { margin-right: 4.19px; } .mr-2 { margin-right: 8px; } .mr-3 { margin-right: 12.19px; } .mr-5 { margin-right: 20.19px; }
 
 /* ---------- typography ---------- */
-.s10 { font-size: 10px; } .s11 { font-size: 11px; } .s12 { font-size: 12px; } .s14 { font-size: 14px; } .s16 { font-size: 16px; }
-.s18 { font-size: 18px; } .s20 { font-size: 20px; } .s22 { font-size: 22px; } .s24 { font-size: 24px; } .s50 { font-size: 50px; }
+.s10 { font-size: 10px; --lh: 11.429px; --lpt: 1.524px; --lpb: 0.762px; }
+.s11 { font-size: 11px; --lh: 12.952px; --lpt: 1.524px; --lpb: 0.381px; }
+.s12 { font-size: 12px; --lh: 14.095px; --lpt: 1.905px; --lpb: 0.381px; }
+.s14 { font-size: 14px; --lh: 16.381px; --lpt: 1.905px; --lpb: 0.381px; }
+.s16 { font-size: 16px; --lh: 18.667px; --lpt: 2.286px; --lpb: 0.762px; }
+.s18 { font-size: 18px; --lh: 21.333px; --lpt: 2.286px; --lpb: 0.381px; }
+.s20 { font-size: 20px; --lh: 23.619px; --lpt: 2.667px; --lpb: 0.762px; }
+.s22 { font-size: 22px; --lh: 25.905px; --lpt: 2.667px; --lpb: 0.762px; }
+.s24 { font-size: 24px; --lh: 27.81px; --lpt: 3.429px; --lpb: 1.143px; }
+.s50 { font-size: 50px; }
 .w100 { font-weight: 100; } .w300 { font-weight: 300; } .w400 { font-weight: 400; } .w500 { font-weight: 500; } .w600 { font-weight: 600; }
 .w700 { font-weight: 700; } .w800 { font-weight: 800; } .w900 { font-weight: 900; }
 .ff-file { font-family: "NSRobotoFile", "Roboto", sans-serif; font-weight: 400; }
@@ -119,12 +136,12 @@
 .bg-8d { background-color: #8d8d8d; }
 
 /* ---------- borders / radii ---------- */
-.border-top-grey { border-top: 1px solid #ecf0f1; }
-.border-top { border-top: 1px solid #888888; }
-.border-bottom { border-bottom: 1px solid #888888; }
-.border-1-grey { border: 1px solid rgb(211, 210, 210); border-radius: 10px; }
-.border-1 { border: 1px solid #d6d4d4; border-radius: 10px; }
-.border-1x { border-style: solid; border-color: #d6d4d4; border-width: 0 1px 1px 0; }
+.border-top-grey { border-top: 1.143px solid #ecf0f1; }
+.border-top { border-top: 1.143px solid #888888; }
+.border-bottom { border-bottom: 1.143px solid #888888; }
+.border-1-grey { border: 1.143px solid rgb(211, 210, 210); border-radius: 10px; }
+.border-1 { border: 1.143px solid #d6d4d4; border-radius: 10px; }
+.border-1x { border-style: solid; border-color: #d6d4d4; border-width: 0 1.143px 1.143px 0; }
 .border-b-2 { border-bottom: 0.76px solid #e5e7eb; }
 .r16 { border-radius: 6.1px; }     /* rounded-lg = 16px physical */
 .r20 { border-radius: 7.62px; }    /* rounded-xl = 20px physical */
@@ -140,7 +157,7 @@
 .tabs-row { gap: 16px; padding: 16px 8px; }  /* p-2 + the pills' own m-2 top and bottom */
 .tabs-row > .tab:last-child { flex: 0 1 auto; min-width: 0; }
 .tab.on { background: #114a97; color: #fff; }
-.tab.off { background: #fff; color: #000; border: 1px solid #373535; border-radius: 11.43px; }
+.tab.off { background: #fff; color: #000; border: 1.143px solid #373535; border-radius: 11.43px; }
 
 /* GridLayout-style buttons (primary-btn3 / primary-btn2 / secondary-btn2) */
 .gbtn { display: flex; align-items: center; justify-content: center; border-radius: 11.43px; color: #fff; align-self: center; }
@@ -184,21 +201,21 @@
 .otp-box:focus { background: #fff; border-color: #000; font-size: 14px; border-radius: 6.1px; }
 
 /* Android Switch (thumb tinted by `color`, track from colorAccent) */
-.nsswitch { width: 50px; height: 32px; position: relative; flex: none; }
-.nsswitch .track { position: absolute; left: 9px; right: 9px; top: 9px; height: 14px; border-radius: 7px; background: rgba(0, 0, 0, 0.38); transition: background .15s; }
-.nsswitch .thumb { position: absolute; top: 6px; left: 5px; width: 20px; height: 20px; border-radius: 50%; background: #2563eb; box-shadow: 0 1px 3px rgba(0, 0, 0, .4); transition: left .15s; }
+.nsswitch { width: 50px; min-height: 26px; position: relative; flex: none; }   /* stretches to the row; thumb and track stay centred */
+.nsswitch .track { position: absolute; left: 10px; width: 33.5px; top: calc(50% - 7px); height: 14px; border-radius: 7px; background: rgba(0, 0, 0, 0.38); transition: background .15s; }
+.nsswitch .thumb { position: absolute; top: calc(50% - 9.75px); left: 7.2px; width: 19.5px; height: 19.5px; border-radius: 50%; background: #2563eb; box-shadow: 0 1px 3px rgba(0, 0, 0, .4); transition: left .15s; }
 .nsswitch.on .track { background: rgba(51, 181, 229, 0.5); }
-.nsswitch.on .thumb { left: 25px; }
+.nsswitch.on .thumb { left: 26.7px; }
 
 /* ListView rows tap ripple-ish */
 .press:active { opacity: .7; }
 
 /* ---------- footer bar ---------- */
-.footer { display: flex; flex-direction: row; justify-content: space-around; align-items: flex-end; background: #fff; border-top: 1px solid #ecf0f1; flex: none; }
+.footer { display: flex; flex-direction: row; justify-content: space-around; align-items: flex-end; background: #fff; border-top: 1.143px solid #ecf0f1; flex: none; }
 .footer .item { display: flex; flex-direction: column; padding: 8px 0; }
 .footer .item img { width: 24px; height: 24px; align-self: center; object-fit: contain; }
 .footer .item .lbl { font-size: 12px; font-weight: 500; padding-top: 4px; text-align: center; }
-.subfooter { display: flex; justify-content: space-around; align-items: flex-end; padding: 8px 0; border-top: 1px solid #ecf0f1; flex: none; background: #fff; }
+.subfooter { display: flex; justify-content: space-around; align-items: flex-end; padding: 8px 0; border-top: 1.143px solid #ecf0f1; flex: none; background: #fff; }
 .subfooter .item { display: flex; flex-direction: column; }
 
 /* ---------- ActionBar (web view) ---------- */
@@ -307,3 +324,11 @@
 .launcher .appicon img { width: 100%; height: 100%; }
 .launcher .name { color: #fff; font-size: 13px; margin-top: 8px; }
 .launcher .hint { color: rgba(255, 255, 255, .55); font-size: 12px; margin-top: 28px; text-align: center; padding: 0 40px; line-height: 1.4; }
+
+/* ListView: 1 device px (0.381 dp) divider between items, transparent */
+.scroll[data-sk] > * + * { margin-top: 0.381px; }
+/* browsers snap borders to whole pixels; the device's 1 dp border is 3 px (1.143 dp),
+   so pad the extra 0.143 dp where a 1 dp top border sits on a padded row */
+.border-top-grey.p-2, .border-top-grey.pt-2, .border-top.p-2 { padding-top: 8.143px; }
+/* bottom-sheet close glyph (text-2xl): measured 25.4 dp line on the device */
+.sheet-body .lbl.fas.s24 { line-height: 25.4px; }

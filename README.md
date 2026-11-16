@@ -43,11 +43,11 @@ The **Device** tab sets location (at seller, 2 km away, off, fake GPS), forces t
 ## Fidelity notes
 
 - The phone is a Pixel 10 (411 × 923 dp, 420 dpi) at 1 CSS px = 1 dp, matching the emulator the reference screenshots came from.
-- Layout is ported from the app's NativeScript templates and resolved styles (`app.android.scss` + `tailwind.config.js`), then checked against screenshots of the real app running on synthetic data. Most screens line up within 1–3 dp. It uses the app's own fonts, images and icons, copied from the repo.
+- Layout is ported from the app's NativeScript templates and resolved styles (`app.android.scss` + `tailwind.config.js`), then checked against screenshots of the real app running on synthetic data. Text and card edges line up within about 1 dp. It uses the app's own fonts, images and icons, copied from the repo.
 - Rules that matter for matching the device:
   - NativeScript reads `px` lengths as physical pixels, so `rounded-lg` (16px) is a 6 dp corner and `br-30` is 11 dp.
   - Percent widths are taken from the parent's full width, and the last item in a row is squeezed into what is left. That is why product images show only their left 73 dp.
-  - Text lines are 1.33× the font size, as Android lays out Roboto with font padding.
+  - Android lays text and spacing out in whole device pixels: a 14 sp line is 49 px (18.67 dp), `pt-1` is 11 px (4.19 dp), and a 1 dp border is 3 px. Lists add a 1 px divider between items.
 - Behaviour follows the source as written, quirks included. Examples: `text-danger-500` isn't a defined colour, so the mobile-number error shows in the default grey. `font-sans` loads the bundled Roboto Black file. Tapping a grey “Arrived at Location” after arrival still opens the OTP sheet.
 - Data is synthetic and resets daily. Trips are always “today”. Changes persist in the browser's local storage until you use **Reset all data**.
 - The Terms & Conditions page loads the live `https://qwipo.com/terms-conditions` inside the web view, as the production app does.

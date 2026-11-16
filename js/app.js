@@ -659,10 +659,11 @@
   function blockLoading() {
     return `<div class="fill center-box"><div class="col center-box" style="height:100px">${spinner()}${L("Loading....", "tc")}</div></div>`;
   }
-  // noservice.png at h-[30%] w-[40%] of the available area
+  // noservice.png at h-[30%] w-[40%]: NativeScript takes 30% of the height left in the parent
+  // after the wrapper's mt-5, so the image box is measured against this container (cqh)
   function emptyState(message, centered) {
-    return `<div class="col ${centered ? "fill" : ""}" style="${centered ? "justify-content:center" : ""}"><div class="col mt-5 ax-c" style="width:100%;align-items:center">
-      <img src="${IMG}noservice.png" style="width:40%;height:calc(var(--sh) * ${centered ? 0.3 : 0.27});object-fit:contain">
+    return `<div class="col fill" style="container-type:size;${centered ? "justify-content:center" : ""}"><div class="col mt-5 ax-c" style="width:100%;align-items:center">
+      <img src="${IMG}noservice.png" style="width:40%;height:calc((100cqh - 20.19px) * 0.3);object-fit:contain;flex:none">
       ${W(message, "c-black s16 mt-2 w500 tc")}</div></div>`;
   }
   // label column / value column rows used in all detail cards
@@ -789,8 +790,8 @@
             <div style="padding-top:23px;display:grid;grid-template-columns:1fr 5px 1fr 5px 1fr 5px 1fr 5px 1fr 5px 1fr">
               ${box(0)}<span></span>${box(1)}<span></span>${box(2)}<span></span>${box(3)}<span></span>${box(4)}<span></span>${box(5)}
             </div>
-            <div class="col ax-c" style="padding-top:22px">${W("00:" + String(v.timer).padStart(2, "0"), "s14", "data-otp-timer")}</div>
-            <div class="row pt-5 between">
+            <div class="col ax-c" style="padding-top:21.2px">${W("00:" + String(v.timer).padStart(2, "0"), "s14", "data-otp-timer")}</div>
+            <div class="row between" style="padding-top:19.4px">
               ${W("Resend OTP", `s14 ff-file ${v.done ? "c-black" : "c-secondary"}`, `data-tap="resendOtp" data-otp-resend style="${v.done ? "" : "opacity:.25"}"`)}
               <div class="row" style="align-items:flex-start">${v.number ? W(v.number, "s14 c-secondary mr-2") : ""}<img src="${IMG}redesign/Edit.png" style="width:16px;height:16px" data-tap="editNumber"></div>
             </div>
@@ -831,7 +832,7 @@
     render() {
       return `<div class="page">
         <div class="fill col"><div class="col bg-white" style="height:95%">
-          <img class="ax-c mt-5" src="${IMG}qwipo-bg.png" style="width:90px;height:40px;object-fit:contain;padding-left:8px;flex:none">
+          <img class="ax-c mt-5" src="${IMG}qwipo-bg.png" style="width:90px;height:40px;object-fit:contain;flex:none">
           <div class="col ax-c" style="width:300px;height:300px;flex:none"><img src="${IMG}update_img.png" style="width:100%;height:100%;object-fit:contain" alt=""></div>
           <div class="col ax-c">
             ${L(" We have an update! ", "w700 s24 pt-2 pl-5 c-black ff-file fake-bold", 'style="white-space:pre"')}
@@ -859,7 +860,7 @@
       const line = (t, extra = "") => L(t, `s18 c-black ff-file tc pt-1 ${extra}`);
       return `<div class="page">
         <div class="fill col bg-white">
-          <img class="ax-c mt-5" src="${IMG}qwipo-bg.png" style="width:90px;height:60px;object-fit:contain;padding-left:8px;flex:none">
+          <img class="ax-c mt-5" src="${IMG}qwipo-bg.png" style="width:90px;height:60px;object-fit:contain;flex:none">
           <div class="col ax-c pt-10">${L("&#xf164;", "c-black fas s50 pt-5 tc")}</div>
           <div class="col ax-c pt-2">
             ${L("Thank You", "s18 c-black ff-file tc pt-5")}
@@ -1020,7 +1021,7 @@
     const vall = (x) => L(x, "s14 c-black w500 pt-1");
     return `<div class="col px-2"><div class="col bg-white m-2 r16" style="margin-bottom:8px">
       <div class="row p-2">
-        <div class="ay-c bg-search p-2 rfull"><img src="${IMG}redesign/deliverytruck-black-icon.svg" style="width:30px;height:30px"></div>
+        <div class="ay-c bg-search p-2 rfull"><img src="${IMG}redesign/deliverytruck-black-icon.svg" style="width:30.1px;height:30.1px"></div>
         <div class="col ay-c" style="${pct(0.65)}">${W(t.tripCode, "s14 tc c-black w500")}</div>
         <div class="pill-blue ay-c vmid tc" style="height:40px;${pct(0.2)}${CLAMP}" data-tap="tripDetails" data-arg="${esc(t.tripId)}">${L("Details", "c-white s12 w500 tc", 'style="width:100%"')}</div>
       </div>
@@ -1225,7 +1226,7 @@
     const mode = `${pointModeLabel(h.pointMode)} ${concatenateLabel(h.pointMode)} ${pointTypeLabel(h.pointType)}`;
     return `<div class="col p-2"><div class="col bg-white m-2 r16" style="margin-bottom:8px">
       <div class="row p-2">
-        <div class="ay-c bg-search p-2 rfull"><img src="${IMG}redesign/deliverytruck-black-icon.svg" style="width:30px;height:30px"></div>
+        <div class="ay-c bg-search p-2 rfull"><img src="${IMG}redesign/deliverytruck-black-icon.svg" style="width:30.1px;height:30.1px"></div>
         <div class="col pl-2 ay-c" style="${pct(0.65)}">${W(h.pointName, "s14 c-black w500")}${L("+91" + h.pointPhone, "c-black s14 pt-1", `data-tap="dial" data-arg="${esc(h.pointPhone)}"`)}</div>
         <div class="pill-blue ay-c vmid tc" style="height:40px;${pct(0.2)}${CLAMP}" data-tap="viewHop" data-arg="${esc(h.id)}">${L("View", "c-white s12 w500 tc", 'style="width:100%"')}</div>
       </div>
@@ -1487,13 +1488,15 @@
   }
   function orderProductsRender(c) {
     if (c.isLoading) return `<div class="fill col bg-search center-box">${spinner("", "width:50px;color:#fff")}</div>`;
-    const top = `<div style="height:40px;flex:none;display:grid;grid-template-columns:1fr 1fr" class="mx-2">
+    // rows="40": the inner GridLayout is verticalAlignment="top", so its row is as tall as its
+    // tallest child (the 32 dp Action pill) and the switch StackLayout stretches to that height
+    const top = `<div style="height:40px;flex:none" class="col"><div style="display:grid;grid-template-columns:1fr 1fr" class="mx-2">
         <div class="row">
           <div class="nsswitch mt-1 ${c.isOrderWise ? "on" : ""}" data-tap="toggleOrderWise"><div class="track"></div><div class="thumb"></div></div>
-          ${L(c.isOrderWise ? "Order Wise" : "Product Wise", "c-black s14 mt-1 ay-c")}
+          ${L(c.isOrderWise ? "Order Wise" : "Product Wise", "c-black s14 mt-1")}
         </div>
         ${c.showEditButton ? `<div class="row" style="justify-content:flex-end;align-items:flex-start"><div class="row action-pill"><div class="row p-1" style="align-items:center">${L("Action", "c-black s14 w500 tc pl-1 pr-1", 'data-tap="wholeHopReturn"')}${L("&#xf0d7;", "fas s14 c-black p-1")}</div></div></div>` : ""}
-      </div>`;
+      </div></div>`;
     let list = "";
     if (c.isOrderWise && c.hopOrders.length > 0) {
       list = `<div class="fill scroll" data-sk="orders">${c.hopOrders.map((o) => `<div class="col px-2 pb-10"><div class="col bg-white r16 m-2">
