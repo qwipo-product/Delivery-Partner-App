@@ -1,9 +1,11 @@
 /* Page chrome around the phone (not part of the app) */
 :root {
-  --dw: 412px;          /* device width in dp  */
-  --dh: 915px;          /* device height in dp */
-  --sbh: 24px;          /* status bar */
-  --nbh: 48px;          /* 3-button navigation bar */
+  /* Pixel 10 reference device: 1080x2424 px at 420 dpi = 411.43 x 923.43 dp */
+  --dw: 411.43px;       /* device width in dp  */
+  --dh: 923.43px;       /* device height in dp */
+  --sbh: 53.71px;       /* status bar (141 px) */
+  --nbh: 23.62px;       /* gesture navigation bar (62 px) */
+  --bz: 10px;           /* bezel */
   --bg: #eef0f3;
   --panel: #ffffff;
   --ink: #1d2433;
@@ -34,25 +36,41 @@ body { background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -app
 /* ---------- device ---------- */
 .device-scale { transform-origin: top left; }
 .device {
-  width: calc(var(--dw) + 20px); height: calc(var(--dh) + 20px);
-  border-radius: 44px; padding: 10px; background: #0b0d10; position: relative;
+  width: calc(var(--dw) + 2 * var(--bz)); height: calc(var(--dh) + 2 * var(--bz));
+  border-radius: 44px; padding: var(--bz); background: #0b0d10; position: relative; overflow: hidden;
   box-shadow: 0 0 0 2px #2b2f36, 0 24px 60px rgba(0, 0, 0, .28);
 }
-.device > .statusbar, .device > .screen, .device > .overlays, .device > .system, .device > .navbar { position: absolute; left: 10px; width: var(--dw); }
-.statusbar { top: 10px; height: var(--sbh); background: #000; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; border-radius: 34px 34px 0 0; font: 500 13px/1 Roboto, system-ui, sans-serif; z-index: 5; }
-.sb-icons { display: flex; gap: 4px; align-items: center; }
-.screen { top: calc(10px + var(--sbh)); height: calc(var(--dh) - var(--sbh) - var(--nbh)); overflow: hidden; --sh: calc(var(--dh) - var(--sbh) - var(--nbh)); container-type: size; }
-.overlays { top: calc(10px + var(--sbh)); height: calc(var(--dh) - var(--sbh) - var(--nbh)); pointer-events: none; z-index: 3; background: transparent; }
+.device > .statusbar, .device > .screen, .device > .overlays, .device > .system, .device > .navbar { position: absolute; left: var(--bz); width: var(--dw); }
+.statusbar { top: var(--bz); height: var(--sbh); background: #757575; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 18px 0 17px; border-radius: 34px 34px 0 0; font: 400 15px/1 Roboto, system-ui, sans-serif; z-index: 5; }
+.sb-left, .sb-icons { display: flex; gap: 8px; align-items: center; }
+.sb-icons { gap: 5px; }
+.screen { top: calc(var(--bz) + var(--sbh)); height: calc(var(--dh) - var(--sbh) - var(--nbh)); overflow: hidden; --sh: calc(var(--dh) - var(--sbh) - var(--nbh)); }
+/* RootLayout (bottom sheets), toasts: app content area */
+.overlays { top: calc(var(--bz) + var(--sbh)); height: calc(var(--dh) - var(--sbh) - var(--nbh)); pointer-events: none; z-index: 3; background: transparent; }
 .overlays > * { pointer-events: auto; }
 .overlays > .toast, .overlays > .snack-layer { pointer-events: none; }
-.system { top: 10px; height: calc(var(--dh) - var(--nbh)); z-index: 4; pointer-events: none; border-radius: 34px 34px 0 0; overflow: hidden; background: transparent; }
+/* native dialogs dim the status bar too but centre in the content area */
+.overlays > .sa-layer, .overlays > .ad-layer, .overlays > .perm-layer, .overlays > .ld-layer { top: calc(-1 * var(--sbh)); }
+.overlays > .sa-layer .sa-wrap, .overlays > .ad-layer .sa-wrap, .overlays > .perm-layer .sa-wrap, .overlays > .ld-layer .ld-wrap { padding-top: var(--sbh); }
+.system { top: var(--bz); height: calc(var(--dh) - var(--nbh)); z-index: 4; pointer-events: none; border-radius: 34px 34px 0 0; overflow: hidden; background: transparent; }
 .system > * { pointer-events: auto; }
 .system:empty { display: none; }
 .device.splashing .statusbar { background: transparent; }
-.navbar { bottom: 10px; height: var(--nbh); background: #000; display: flex; justify-content: space-around; align-items: center; border-radius: 0 0 34px 34px; z-index: 6; }
-.navbar button { background: none; border: 0; color: #e6e6e6; width: 72px; height: 40px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.navbar button:hover { background: rgba(255, 255, 255, .08); }
-.navbar button:focus-visible { outline: 2px solid #7aa7ea; }
+.navbar { top: calc(var(--bz) + var(--dh) - var(--nbh)); height: var(--nbh); background: #000; display: flex; justify-content: center; align-items: center; border-radius: 0 0 34px 34px; z-index: 6; }
+.navbar .pill { width: 108px; height: 4px; border-radius: 2px; background: #f2f2f2; }
+.hw-keys { display: flex; justify-content: center; gap: 10px; margin-top: 12px; }
+.hw-keys button { font: 600 13px system-ui, sans-serif; padding: 7px 14px; border-radius: 18px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.hw-keys button:hover { border-color: var(--accent); }
+
+/* bare mode (?bare=1): just the phone screen at 1:1, for screenshot comparison */
+body.bare { background: #000; }
+body.bare .stage { padding: 0; display: block; }
+body.bare .panel, body.bare .hw-keys { display: none; }
+body.bare .phone-col { position: static; }
+body.bare { --bz: 0px; }
+body.bare .device { border-radius: 0; box-shadow: none; }
+body.bare .statusbar, body.bare .system { border-radius: 0; }
+body.bare .navbar { border-radius: 0; }
 
 /* ---------- panel ---------- */
 .panel { width: 380px; max-width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 18px 22px; }

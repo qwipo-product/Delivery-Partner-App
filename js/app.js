@@ -294,7 +294,8 @@
     clearTimeout(toastTimer);
     toastEl = document.createElement("div");
     toastEl.className = "toast";
-    toastEl.textContent = message;
+    // Android 12+ system toast: light pill with the app icon
+    toastEl.innerHTML = `<img src="assets/icon.png" alt=""><span>${esc(message)}</span>`;
     ovEl.appendChild(toastEl);
     requestAnimationFrame(() => toastEl && toastEl.classList.add("in"));
     const el = toastEl;
@@ -306,21 +307,25 @@
   const loader = {
     show(message) {
       if (!loaderEl) loaderEl = layer("ld-layer");
-      loaderEl.innerHTML = `<div class="ld-wrap"><div class="ld">${spinner()}<div class="ld-msg">${esc(message)}</div></div></div>`;
+      // loaderOptions.android.progressStyle = 1 → horizontal indeterminate bar
+      loaderEl.innerHTML = `<div class="ld-wrap"><div class="ld"><div class="ld-bar"><span></span></div><div class="ld-msg">${esc(message)}</div></div></div>`;
     },
     hide() { if (loaderEl) { loaderEl.remove(); loaderEl = null; } },
   };
 
   // ---- TNSFancyAlert (SweetAlertDialog on Android) ----
+  // TNSFancyAlert on Android: coloured header with a V-shaped lower edge, white ring icon
+  // (open near 4 o'clock), bold title, left-aligned body and an outlined button.
+  const RING = `<path d="M33.6 42.2 A19.5 19.5 0 1 1 41.1 36.3" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round"/>`;
   const ICONS = {
-    success: `<svg class="sa-icon" viewBox="0 0 53 53"><circle cx="26.5" cy="26.5" r="24.5" fill="none" stroke="#A5DC86" stroke-width="3" opacity=".3"/><circle cx="26.5" cy="26.5" r="24.5" fill="none" stroke="#A5DC86" stroke-width="3"/><g class="sa-check"><path d="M15 27 L23 35 L39 18" fill="none" stroke="#A5DC86" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`,
-    error: `<svg class="sa-icon sa-pulse" viewBox="0 0 53 53"><circle cx="26.5" cy="26.5" r="24.5" fill="none" stroke="#F27474" stroke-width="3"/><path d="M17 17 L36 36 M36 17 L17 36" stroke="#F27474" stroke-width="4" stroke-linecap="round"/></svg>`,
-    warning: `<svg class="sa-icon sa-pulse" viewBox="0 0 53 53"><circle cx="26.5" cy="26.5" r="24.5" fill="none" stroke="#F8BB86" stroke-width="3"/><path d="M26.5 13 V31" stroke="#F8BB86" stroke-width="4" stroke-linecap="round"/><circle cx="26.5" cy="38.5" r="2.6" fill="#F8BB86"/></svg>`,
+    success: `<svg class="fa-icon" viewBox="0 0 49 49">${RING}<path d="M16.2 25.4 L21.9 31 L32.6 19.6" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    error: `<svg class="fa-icon" viewBox="0 0 49 49">${RING}<path d="M18.4 18.4 L30.6 30.6 M30.6 18.4 L18.4 30.6" stroke="#fff" stroke-width="2.3" stroke-linecap="round"/></svg>`,
+    warning: `<svg class="fa-icon" viewBox="0 0 49 49">${RING}<path d="M24.5 13.6 V27.5" stroke="#fff" stroke-width="2.3" stroke-linecap="round"/><circle cx="24.5" cy="33.8" r="1.6" fill="#fff"/></svg>`,
   };
   function fancy(type, title, detail, button = "OK") {
     return new Promise((resolve) => {
       const el = layer("sa-layer");
-      el.innerHTML = `<div class="sa-wrap"><div class="sa-dim"></div><div class="sa">${ICONS[type]}<div class="sa-title">${esc(title)}</div><div class="sa-text">${esc(detail)}</div><div class="sa-btn ${type === "warning" ? "red" : "blue"}" data-sa="ok">${esc(button)}</div></div></div>`;
+      el.innerHTML = `<div class="sa-wrap"><div class="sa-dim"></div><div class="fa fa-${type}"><div class="fa-head"><svg class="fa-band" viewBox="0 0 288 85" preserveAspectRatio="none"><path d="M0 0 H288 V75 L144 85 L0 75 Z"/></svg>${ICONS[type]}</div><div class="fa-title">${esc(title)}</div><div class="fa-text">${esc(detail)}</div><div class="fa-btn" data-sa="ok">${esc(button)}</div></div></div>`;
       el.querySelector("[data-sa]").addEventListener("click", (e) => { e.stopPropagation(); el.remove(); resolve(); });
       panelEvent("alert", { type, title, detail });
     });
@@ -333,7 +338,7 @@
   function confirmDialog(message, okText, cancelText) {
     return new Promise((resolve) => {
       const el = layer("ad-layer");
-      el.innerHTML = `<div class="sa-wrap"><div class="sa-dim" data-ad="out"></div><div class="ad"><div class="ad-msg">${esc(message)}</div><div class="ad-btns"><div data-ad="no">${esc(cancelText)}</div><div data-ad="yes">${esc(okText)}</div></div></div></div>`;
+      el.innerHTML = `<div class="sa-wrap"><div class="sa-dim ad-dim" data-ad="out"></div><div class="ad"><div class="ad-msg">${esc(message)}</div><div class="ad-btns"><div data-ad="no">${esc(cancelText)}</div><div data-ad="yes">${esc(okText)}</div></div></div></div>`;
       el.addEventListener("click", (e) => {
         const b = e.target.closest("[data-ad]");
         if (!b) return;
@@ -349,13 +354,20 @@
     return new Promise((resolve) => {
       const el = layer("perm-layer");
       let precise = true;
-      el.innerHTML = `<div class="sa-wrap"><div class="sa-dim"></div><div class="perm">
-        <svg class="perm-ico" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
-        <div class="perm-title">Allow <b>Qwipo DP</b> to access this device's location?</div>
-        <div class="perm-maps"><div class="opt sel" data-pm="precise"><div class="map"></div>Precise</div><div class="opt" data-pm="approx"><div class="map" style="background:radial-gradient(circle,#c9dcff 0 40%,#e3ecff 41%)"></div>Approximate</div></div>
+      // Android 16 runtime permission dialog (the reference device runs the system dark theme)
+      const roads = (c) => `<path d="M0 22 L124 8 M0 52 L124 40 M0 80 L124 70 M20 0 L34 92 M58 0 L70 92 M96 0 L104 92 M0 34 L60 92" stroke="${c}" stroke-width="2.4" fill="none"/>`;
+      const preciseMap = `<svg viewBox="0 0 124 92" class="pmap"><rect width="124" height="92" rx="6" fill="#4b4446"/>${roads("#e8e8e8")}<path d="M62 60c-9-12-14-19-14-26a14 14 0 0 1 28 0c0 7-5 14-14 26z" fill="#4f8ef7"/><circle cx="62" cy="34" r="5" fill="#fff"/><ellipse cx="62" cy="62" rx="9" ry="3" fill="#fff" opacity=".85"/></svg>`;
+      const approxMap = `<svg viewBox="0 0 124 92" class="pmap"><rect width="124" height="92" rx="6" fill="#4b4446"/>${roads("#f2c94c")}<circle cx="64" cy="46" r="22" fill="#4f8ef7" opacity=".45"/></svg>`;
+      el.innerHTML = `<div class="sa-wrap"><div class="sa-dim perm-dim"></div><div class="perm">
+        <svg class="perm-ico" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M12 21s-6.5-6.6-6.5-11.5a6.5 6.5 0 0 1 13 0C18.5 14.4 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+        <div class="perm-title">Allow <b>Qwipo DP</b> to access this device’s location?</div>
+        <div class="perm-maps">
+          <div class="opt sel" data-pm="precise"><div class="opt-h"><span class="chk"></span>Precise</div>${preciseMap}</div>
+          <div class="opt" data-pm="approx"><div class="opt-h"><span class="chk"></span>Approximate</div>${approxMap}</div>
+        </div>
         <div class="perm-btn" data-pa="while">While using the app</div>
         <div class="perm-btn" data-pa="once">Only this time</div>
-        <div class="perm-btn" data-pa="deny">Don't allow</div></div></div>`;
+        <div class="perm-btn" data-pa="deny">Don’t allow</div></div></div>`;
       el.addEventListener("click", (e) => {
         const pm = e.target.closest("[data-pm]");
         if (pm) {
@@ -497,8 +509,8 @@
     let body = "";
     const twoBtns = (leftLabel, leftTap, rightLabel, rightTap, rightBg, rightTxt) => `
       <div class="row p-2 mt-10">
-        <div class="col w50p"><div class="row r30 border-1 bg-search ax-c" style="border-radius:30px" data-stap="${leftTap}"><div class="row p-3 px-5">${L(leftLabel, "c-black s14 w500 tc")}</div></div></div>
-        <div class="col w50p"><div class="row ax-c ${rightBg}" style="border:1px solid #d6d4d4;border-radius:30px" data-stap="${rightTap}"><div class="row p-3 px-5">${L(rightLabel, `${rightTxt} s14 w500 tc`)}</div></div></div>
+        <div class="col" style="${pct(0.5)}"><div class="row border-1 bg-search ax-c" style="border-radius:11.43px" data-stap="${leftTap}"><div class="row p-3 px-5">${L(leftLabel, "c-black s14 w500 tc")}</div></div></div>
+        <div class="col" style="${pct(0.5)}${CLAMP}"><div class="row ax-c ${rightBg}" style="border:1px solid #d6d4d4;border-radius:11.43px" data-stap="${rightTap}"><div class="row p-3 px-5">${L(rightLabel, `${rightTxt} s14 w500 tc`)}</div></div></div>
       </div>`;
     switch (s.type) {
       case 10001: // Logout
@@ -520,7 +532,7 @@
         body = `<div class="col pb-5 px-5 bg-white" style="height:600px">
           <div class="col p-5">${W("Please Enter OTP Number", "c-black tl w700 s22 mt-5")}</div>
           <div class="fill"><div class="bg-search border-1-grey mx-5 p-2 ax-c" style="height:40px;width:50%;margin-left:auto;margin-right:auto"><input class="tf c-black tc s18" style="padding:0" inputmode="numeric" data-sinput="otp" data-fk="sheetOtp" value="${esc(s.otpInput)}"></div></div>
-          <div class="col mx-5 mt-10" style="height:70px;flex:none"><div class="lbl c-white bg-info r30 tc w500 s14 ff-file ax-c mt-5 p-3" style="width:85%;height:44px;min-width:200px" data-stap="otpSubmit">Submit</div></div>
+          <div class="col mx-5 mt-10" style="height:70px;flex:none"><div class="lbl c-white bg-info rfull tc w500 s14 ff-file ax-c mt-5 p-3" style="width:85%;height:44px;min-width:200px" data-stap="otpSubmit">Submit</div></div>
         </div>`;
         break;
       case 10005: // Pending Returns
@@ -654,6 +666,11 @@
       ${W(message, "c-black s16 mt-2 w500 tc")}</div></div>`;
   }
   // label column / value column rows used in all detail cards
+  // NativeScript resolves w-[N%] against the parent's full width (padding included),
+  // and the last child of a horizontal StackLayout is squeezed into the space that is left.
+  const pct = (p, pad = 16) => `width:calc((100% + ${pad}px) * ${p});`;
+  const CLAMP = "flex:0 1 auto;min-width:0;";
+  const kvDirect = (labels, values, lp, vp) => `<div class="col" style="${pct(lp)}">${labels.map((l) => W(l, "c-secondary s14 w500 pt-1")).join("")}</div><div class="col" style="${pct(vp)}${CLAMP}">${values.map((v) => L(v, "s14 c-black w500 pt-1 ax-r")).join("")}</div>`;
   const kv = (labels, values, lw = "w50p", vw = "w50p") => `<div class="row" style="width:100%"><div class="col ${lw}">${labels.map((l) => W(l, "c-secondary s14 w500 pt-1")).join("")}</div><div class="col ${vw}">${values.map((v) => L(v, "s14 c-black w500 pt-1 ax-r")).join("")}</div></div>`;
 
   // ================================================================ SCREENS
@@ -726,7 +743,7 @@
       const t = v.text || "";
       const valid = isValidMobileNumber(t);
       return `<div class="page bg-white">
-        <div class="col" style="height:70%;flex:none;justify-content:center"><div class="col m-2 p-2" style="height:70%;overflow:hidden">
+        <div class="col" style="height:70%;flex:none"><div class="col mx-2 p-2" style="height:70%;overflow:hidden">
           <img class="ax-c" src="${IMG}qwipo-bg.png" style="width:90px;height:60px;object-fit:contain;flex:none">
           ${W("Enter mobile number", "c-black ff-file fake-bold s16 mt-10 pl-3")}
           <div class="cell bg-search border-1-grey pl-4 mt-2" style="flex:none">
@@ -744,7 +761,7 @@
         </div></div>
         <div class="col" style="height:30%;flex:none">
           <div class="col ax-c">${L("By proceeding, you are agreeing to Qwipo's", "s14 c-secondary pt-5 tc")}${L("Terms & Conditions", "s14 c-black pt-2 w700 tc", 'data-tap="openTerms"')}</div>
-          <div class="col" style="height:60px;flex:none"><div class="nbtn ${v.enable ? "p2" : "s2"} mt-5" style="height:48px;min-height:48px" ${v.enable ? 'data-tap="sendOtp"' : ""}>Continue</div></div>
+          <div class="col" style="height:60px;flex:none;justify-content:flex-end"><div class="nbtn ${v.enable ? "p2" : "s2"} mt-5" style="height:48px;min-height:48px" ${v.enable ? 'data-tap="sendOtp"' : ""}>Continue</div></div>
         </div>
       </div>`;
     },
@@ -765,23 +782,23 @@
     render(v) {
       const box = (i) => `<input class="otp-box ${i === 1 ? "sq" : ""}" inputmode="numeric" maxlength="1" placeholder="0" data-input="otp" data-arg="${i}" data-fk="otp${i}" value="${esc(v.fields[i])}" autocomplete="one-time-code">`;
       return `<div class="page bg-white">
-        <div class="col" style="height:70%;flex:none;justify-content:center"><div class="col m-2 p-2" style="height:70%;overflow:hidden">
+        <div class="col" style="height:70%;flex:none"><div class="col mx-2 p-2" style="height:70%;overflow:hidden">
           <img class="ax-c" src="${IMG}qwipo-bg.png" style="width:90px;height:60px;object-fit:contain;flex:none">
           ${W("Enter 6-digit OTP", "c-black ff-file fake-bold s16 mt-10 pl-3")}
           <div class="col px-3" style="flex:none">
-            <div class="pt-5" style="display:grid;grid-template-columns:1fr 5px 1fr 5px 1fr 5px 1fr 5px 1fr 5px 1fr">
+            <div style="padding-top:23px;display:grid;grid-template-columns:1fr 5px 1fr 5px 1fr 5px 1fr 5px 1fr 5px 1fr">
               ${box(0)}<span></span>${box(1)}<span></span>${box(2)}<span></span>${box(3)}<span></span>${box(4)}<span></span>${box(5)}
             </div>
-            <div class="col pt-5 ax-c">${W("00:" + String(v.timer).padStart(2, "0"), "s14")}</div>
+            <div class="col ax-c" style="padding-top:22px">${W("00:" + String(v.timer).padStart(2, "0"), "s14", "data-otp-timer")}</div>
             <div class="row pt-5 between">
-              ${W("Resend OTP", `s14 ff-file ${v.done ? "c-black" : "c-secondary"}`, `data-tap="resendOtp" style="${v.done ? "" : "opacity:.25"}"`)}
-              <div class="row w50p" style="align-items:flex-start">${v.number ? W(v.number, "s14 c-secondary mr-2") : ""}<img src="${IMG}redesign/Edit.png" style="width:16px;height:16px" data-tap="editNumber"></div>
+              ${W("Resend OTP", `s14 ff-file ${v.done ? "c-black" : "c-secondary"}`, `data-tap="resendOtp" data-otp-resend style="${v.done ? "" : "opacity:.25"}"`)}
+              <div class="row" style="align-items:flex-start">${v.number ? W(v.number, "s14 c-secondary mr-2") : ""}<img src="${IMG}redesign/Edit.png" style="width:16px;height:16px" data-tap="editNumber"></div>
             </div>
           </div>
         </div></div>
         <div class="col" style="height:30%;flex:none">
           <div class="col ax-c">${L("By proceeding, you are agreeing to Qwipo's", "s14 c-secondary pt-5 tc")}${L("Terms & Conditions", "s14 c-black pt-2 w700 tc", 'data-tap="openTerms"')}</div>
-          <div class="col" style="height:60px;flex:none"><div class="nbtn ${v.enable ? "p2" : "s2"} mt-5" style="height:48px;min-height:48px" ${v.enable ? 'data-tap="verifyOtp"' : ""}>Continue</div></div>
+          <div class="col" style="height:60px;flex:none;justify-content:flex-end"><div class="nbtn ${v.enable ? "p2" : "s2"} mt-5" style="height:48px;min-height:48px" ${v.enable ? 'data-tap="verifyOtp"' : ""}>Continue</div></div>
         </div>
       </div>`;
     },
@@ -791,9 +808,15 @@
       if (!alive()) { clearInterval(id); return; }
       v.timer--;
       if (v.timer <= 0) { v.done = true; clearInterval(id); }
-      const el = screenEl.querySelector(".page .pt-5.ax-c .lbl");
-      render();
-      void el;
+      // update just the countdown and the Resend OTP state (no full re-render)
+      const t = screenEl.querySelector("[data-otp-timer]");
+      if (t) t.textContent = "00:" + String(v.timer).padStart(2, "0");
+      const r = screenEl.querySelector("[data-otp-resend]");
+      if (r) {
+        r.classList.toggle("c-black", v.done);
+        r.classList.toggle("c-secondary", !v.done);
+        r.style.opacity = v.done ? "" : ".25";
+      }
     }, 1000);
     timers.push(id);
   }
@@ -809,7 +832,7 @@
       return `<div class="page">
         <div class="fill col"><div class="col bg-white" style="height:95%">
           <img class="ax-c mt-5" src="${IMG}qwipo-bg.png" style="width:90px;height:40px;object-fit:contain;padding-left:8px;flex:none">
-          <div class="col ax-c" style="width:300px;height:300px;flex:none"><img class="ax-c" src="${IMG}update_img.png" style="width:88px;height:88px;object-fit:contain"></div>
+          <div class="col ax-c" style="width:300px;height:300px;flex:none"><img src="${IMG}update_img.png" style="width:100%;height:100%;object-fit:contain" alt=""></div>
           <div class="col ax-c">
             ${L(" We have an update! ", "w700 s24 pt-2 pl-5 c-black ff-file fake-bold", 'style="white-space:pre"')}
             <div class="col ax-c">
@@ -911,17 +934,18 @@
       v.number = (c && c.number) || "";
     },
     render(v) {
-      const row = (icon, title, value, tapAttr = "") => `<div class="row ml-4 border-top p-2" style="align-items:center">
+      // the rows' container has space-y-2 (8 dp between rows); the logos' row has space-x-2
+      const row = (icon, title, value, tapAttr = "", first = false) => `<div class="row ml-4 border-top p-2" style="align-items:center;${first ? "" : "margin-top:8px"}">
           <div class="bg-white rfull p-4" style="width:50px;height:50px;display:flex;justify-content:center;align-items:center;flex:none"><img src="${IMG}redesign/icons/${icon}.svg" style="width:20px;height:20px;background:#fff"></div>
           <div class="col ml-4" style="flex:1;min-width:0">${L(title, "s14 c-black")}${L(value, "s16 pt-1 w600 c-black", tapAttr)}</div>
         </div>`;
       return `<div class="page bg-search">
         ${backHeader("Contact Us", "back")}
         <div class="col mt-4 ml-4" style="flex:none">${L("If you have any query or need any further help", "s14 ff-file w600 c-gray400")}</div>
-        <div class="col ax-c" style="width:250px;height:250px;flex:none"><img class="ax-c" src="${IMG}Contactus_mid.png" style="width:88px;height:88px;object-fit:contain"></div>
-        <div class="row ml-4" style="align-items:center;flex:none"><img src="${IMG}Contact_Qwipo_Logo_top.png" style="width:48px;height:48px;object-fit:contain"><img src="${IMG}Contact_Qwipo_Logo_bg.png" style="width:48px;height:48px;object-fit:contain"></div>
+        <div class="col ax-c" style="width:250px;height:250px;flex:none"><img src="${IMG}Contactus_mid.png" style="width:100%;height:100%;object-fit:contain" alt=""></div>
+        <div class="row ml-4" style="align-items:center;flex:none"><img src="${IMG}Contact_Qwipo_Logo_top.png" style="width:48px;height:48px;object-fit:contain"><img src="${IMG}Contact_Qwipo_Logo_bg.png" style="width:48px;height:48px;object-fit:contain;margin-left:8px"></div>
         <div class="fill col mt-4">
-          ${row("clock", "Office Timing", "09:00 AM to 6:00 PM - IST")}
+          ${row("clock", "Office Timing", "09:00 AM to 6:00 PM - IST", "", true)}
           ${row("email", "Email Address", v.email)}
           ${row("mobile", "Customer Care Number", v.number, `data-tap="dial" data-arg="${esc(v.number)}"`)}
         </div>
@@ -943,7 +967,7 @@
     },
     render(v) {
       return `<div class="page">
-        <div class="actionbar"><div class="nav" data-tap="webBack"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#5f6368" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></div>${L(v.title, "s14", 'style="margin-left:16px"')}</div>
+        <div class="actionbar"><div class="nav" data-tap="webBack"><svg width="28" height="28" viewBox="0 0 28 28"><path d="M3 14 L13 4.5 V10 H25 V18 H13 V23.5 Z" fill="#fff" stroke="#8a8a8a" stroke-width="1.3" stroke-linejoin="round"/></svg></div>${L(v.title, "s14 tc", 'style="position:absolute;left:0;right:0;pointer-events:none"')}</div>
         <div class="fill col p-5"><div class="fill relative">${v.src ? `<iframe src="${esc(v.src)}" style="position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff" referrerpolicy="no-referrer"></iframe>` : ""}</div></div>
       </div>`;
     },
@@ -994,19 +1018,19 @@
     const g = (l) => W(l, "c-secondary s14 w500 pt-1");
     const val = (x) => L(x, "s14 c-black w500 pt-1 ax-r");
     const vall = (x) => L(x, "s14 c-black w500 pt-1");
-    return `<div class="px-2"><div class="col bg-white m-2 r16" style="margin-bottom:8px">
+    return `<div class="col px-2"><div class="col bg-white m-2 r16" style="margin-bottom:8px">
       <div class="row p-2">
         <div class="ay-c bg-search p-2 rfull"><img src="${IMG}redesign/deliverytruck-black-icon.svg" style="width:30px;height:30px"></div>
-        <div class="col w65p ay-c">${W(t.tripCode, "s14 tc c-black w500")}</div>
-        <div class="pill-blue w20p ay-c vmid tc" style="height:40px" data-tap="tripDetails" data-arg="${esc(t.tripId)}">${L("Details", "c-white s12 w500 tc", 'style="width:100%"')}</div>
+        <div class="col ay-c" style="${pct(0.65)}">${W(t.tripCode, "s14 tc c-black w500")}</div>
+        <div class="pill-blue ay-c vmid tc" style="height:40px;${pct(0.2)}${CLAMP}" data-tap="tripDetails" data-arg="${esc(t.tripId)}">${L("Details", "c-white s12 w500 tc", 'style="width:100%"')}</div>
       </div>
       <div class="row p-2 border-top-grey">
-        <div class="col w40p">${["Order Number", "Driver", "Driver Number", "Helper", "Helper Number", "Weight", "Type", "Vehicle Number"].map(g).join("")}</div>
-        <div class="col w60p mr-2">${[t.logisticsOrderId, t.driver, t.phone, t.helperName, t.helperPhone, weightPipe(t.totalWeightKg), t.vehicleType, t.vehicleRegistrationNumber].map(val).join("")}</div>
+        <div class="col" style="${pct(0.4)}">${["Order Number", "Driver", "Driver Number", "Helper", "Helper Number", "Weight", "Type", "Vehicle Number"].map(g).join("")}</div>
+        <div class="col" style="${pct(0.6)}${CLAMP}">${[t.logisticsOrderId, t.driver, t.phone, t.helperName, t.helperPhone, weightPipe(t.totalWeightKg), t.vehicleType, t.vehicleRegistrationNumber].map(val).join("")}</div>
       </div>
       <div class="row p-2 border-top-grey">
-        <div class="row w50p"><div class="col w50p">${g("Pickups")}${g("Deliveries")}</div><div class="col w50p">${vall(t.pickupHops)}${vall(t.deliveryHops)}</div></div>
-        <div class="row w50p"><div class="col w50p">${g("Returns")}${g("Status")}</div><div class="col w50p">${vall(t.returnHops)}${vall(t.status)}</div></div>
+        <div class="row" style="${pct(0.5)}"><div class="col w50p">${g("Pickups")}${g("Deliveries")}</div><div class="col w50p">${vall(t.pickupHops)}${vall(t.deliveryHops)}</div></div>
+        <div class="row" style="${pct(0.5)}${CLAMP}"><div class="col w50p">${g("Returns")}${g("Status")}</div><div class="col w50p">${vall(t.returnHops)}${vall(t.status)}</div></div>
       </div>
     </div></div>`;
   }
@@ -1026,7 +1050,7 @@
     render(v) {
       return `<div class="page bg-search">
         <div class="row p-2" style="flex:none" data-tap="tripsBack">${L("&#xf053;", "back-arrow")}${v.isTripSummaryActive ? L("Trip Summary", "title") : ""}${v.isHopsActive ? L("Hops List", "title") : ""}</div>
-        <div class="row p-2" style="flex:none;justify-content:center">
+        <div class="row p-2 tabs-row" style="flex:none">
           <div class="tab w50p ${v.isTripSummaryActive ? "on" : "off"}" data-tap="tripsSummaryTab">${L("Summary", "tc s16")}</div>
           <div class="tab w50p ${v.isHopsActive ? "on" : "off"}" data-tap="tripsHopsTab">${L("Hops", "tc s16")}</div>
         </div>
@@ -1199,21 +1223,21 @@
   }
   function hopCard(h) {
     const mode = `${pointModeLabel(h.pointMode)} ${concatenateLabel(h.pointMode)} ${pointTypeLabel(h.pointType)}`;
-    return `<div class="p-2"><div class="col bg-white m-2 r16" style="margin-bottom:8px">
+    return `<div class="col p-2"><div class="col bg-white m-2 r16" style="margin-bottom:8px">
       <div class="row p-2">
         <div class="ay-c bg-search p-2 rfull"><img src="${IMG}redesign/deliverytruck-black-icon.svg" style="width:30px;height:30px"></div>
-        <div class="col w65p pl-2 ay-c">${W(h.pointName, "s14 c-black w500")}${L("+91" + h.pointPhone, "c-black s14 pt-1", `data-tap="dial" data-arg="${esc(h.pointPhone)}"`)}</div>
-        <div class="pill-blue w20p ay-c vmid tc" style="height:40px" data-tap="viewHop" data-arg="${esc(h.id)}">${L("View", "c-white s12 w500 tc", 'style="width:100%"')}</div>
+        <div class="col pl-2 ay-c" style="${pct(0.65)}">${W(h.pointName, "s14 c-black w500")}${L("+91" + h.pointPhone, "c-black s14 pt-1", `data-tap="dial" data-arg="${esc(h.pointPhone)}"`)}</div>
+        <div class="pill-blue ay-c vmid tc" style="height:40px;${pct(0.2)}${CLAMP}" data-tap="viewHop" data-arg="${esc(h.id)}">${L("View", "c-white s12 w500 tc", 'style="width:100%"')}</div>
       </div>
       <div class="row p-2 border-top-grey"><div style="display:grid;grid-template-columns:minmax(0,1fr) 75px;width:100%">
         <div class="col ay-c">${L("Address", "s14 c-black w500")}${W(h.pointAddress, "c-black s14 pt-1")}</div>
         <div class="ay-c" data-tap="openMap" data-arg="${esc(h.pointLat)},${esc(h.pointLng)}"><img src="${IMG}redesign/Map.svg" style="width:50px;height:50px"></div>
       </div></div>
       <div class="row p-2 border-top-grey">
-        <div class="row w50p"><div class="col w50p">${L("Status", "c-secondary s14 w500 pt-1")}</div><div class="col w50p">${L(h.status, "s14 c-black w500 pt-1")}</div></div>
-        <div class="row w50p"><div class="col w50p">${L("Hop", "c-secondary s14 w500 pt-1")}</div><div class="col w50p">${L(h.stopNumber, "s14 c-black w500 pt-1")}</div></div>
+        <div class="row" style="${pct(0.5)}"><div class="col w50p">${L("Status", "c-secondary s14 w500 pt-1")}</div><div class="col w50p">${L(h.status, "s14 c-black w500 pt-1")}</div></div>
+        <div class="row" style="${pct(0.5)}${CLAMP}"><div class="col w50p">${L("Hop", "c-secondary s14 w500 pt-1")}</div><div class="col w50p">${L(h.stopNumber, "s14 c-black w500 pt-1")}</div></div>
       </div>
-      <div class="row p-2 border-top-grey"><div class="col w50p">${L("Hop Mode", "s14 c-black w500")}</div><div class="col w50p">${L(mode, "s14 c-black w500 ax-r")}</div></div>
+      <div class="row p-2 border-top-grey"><div class="col" style="${pct(0.5)}">${L("Hop Mode", "s14 c-black w500")}</div><div class="col" style="${pct(0.5)}${CLAMP}">${L(mode, "s14 c-black w500 ax-r")}</div></div>
     </div></div>`;
   }
   function searchHops(c, raw) {
@@ -1262,7 +1286,7 @@
       if (v.tab === "returns" && v.rt) comp = returnsRender(v.rt);
       return `<div class="page bg-search">
         <div class="row p-2" style="flex:none" data-tap="hopsBack">${L("&#xf053;", "back-arrow")}${L(v.hop && v.hop.pointName, "title shrink")}</div>
-        <div class="row p-2" style="flex:none;justify-content:center">${tabs.map((t) => `<div class="tab ${wcls} ${v.tab === t.key ? "on" : "off"}" data-tap="hopTab" data-arg="${t.key}">${L(t.label, "tc s16")}</div>`).join("")}</div>
+        <div class="row p-2 tabs-row" style="flex:none">${tabs.map((t) => `<div class="tab ${wcls} ${v.tab === t.key ? "on" : "off"}" data-tap="hopTab" data-arg="${t.key}">${L(t.label, "tc s16")}</div>`).join("")}</div>
         <div class="fill col mt-2">${comp}</div>
       </div>`;
     },
@@ -1314,8 +1338,8 @@
       </div>`;
     } else {
       bottom = `<div class="mb-30" style="height:120px;flex:none;display:grid;grid-template-columns:5px 1fr 5px 1fr 5px;align-items:center">
-        <div style="grid-column:2;display:flex;flex-direction:column" data-tap="hopArrived"><div class="nbtn px-2 ${hs.status == "Created" ? "p2" : "s2"}">Arrived at Location</div></div>
-        <div style="grid-column:4;display:flex;flex-direction:column"><div class="nbtn px-2 ${hs.status == "InProgress" ? "p2" : "s2"}" ${hs.status === "InProgress" ? 'data-tap="hopCompleteDelivery"' : ""}>${hs.status === "Completed" ? "Hop Completed" : "Complete"}</div></div>
+        <div style="grid-column:2;display:flex;flex-direction:column" data-tap="hopArrived"><div class="nbtn px-2 ${hs.status == "Created" ? "p2" : "s2"}" style="width:calc(80% - 7.4px)">Arrived at Location</div></div>
+        <div style="grid-column:4;display:flex;flex-direction:column"><div class="nbtn px-2 ${hs.status == "InProgress" ? "p2" : "s2"}" style="width:calc(80% - 7.4px)" ${hs.status === "InProgress" ? 'data-tap="hopCompleteDelivery"' : ""}>${hs.status === "Completed" ? "Hop Completed" : "Complete"}</div></div>
       </div>`;
     }
     return `<div class="fill col">
@@ -1472,15 +1496,15 @@
       </div>`;
     let list = "";
     if (c.isOrderWise && c.hopOrders.length > 0) {
-      list = `<div class="fill scroll" data-sk="orders">${c.hopOrders.map((o) => `<div class="px-2 pb-10"><div class="col bg-white r16 m-2">
+      list = `<div class="fill scroll" data-sk="orders">${c.hopOrders.map((o) => `<div class="col px-2 pb-10"><div class="col bg-white r16 m-2">
           <div class="col bg-white r16 p-2">${W(o.orderNumber, "s16 c-black w600 ff-file mt-2")}</div>
-          <div class="row p-2 border-top-grey">${kv(["Order Date", "Order Status", "Order Weight", "Order Total"], [o.orderDate, o.status, weightPipe(o.weight), replaceCommas(o.orderAmount)], "w25p", "w75p")}</div>
+          <div class="row p-2 border-top-grey">${kvDirect(["Order Date", "Order Status", "Order Weight", "Order Total"], [o.orderDate, o.status, weightPipe(o.weight), replaceCommas(o.orderAmount)], 0.25, 0.75)}</div>
         </div></div>`).join("")}</div>`;
     } else if (!c.isOrderWise && c.hopProducts.length > 0) {
-      list = `<div class="fill scroll" data-sk="products">${c.hopProducts.map((g) => `<div class="px-2">
+      list = `<div class="fill scroll" data-sk="products">${c.hopProducts.map((g) => `<div class="col px-2">
           <div class="cell bg-white r16 m-2 p-2">
             <div class="row w70p ax-l">${W("#" + g.orderNumber, "s16 c-black w600 ff-file mt-2")}</div>
-            ${c.showEditButton ? `<div class="row w30p ax-r" style="justify-content:flex-end"><div class="row pill-blue ml-1" style="width:70%;justify-content:center"><div class="lbl s11 tc w500 c-white ff-file p-1 vmid tc" style="height:32px;width:100%" data-tap="editWholeOrder" data-arg="${esc(g.orderNumber)}">Edit</div></div></div>` : ""}
+            ${c.showEditButton ? `<div class="row pill-blue ax-r ay-t" style="width:77px;height:32px;justify-content:center"><div class="lbl s11 tc w500 c-white ff-file p-1 vmid tc" style="height:32px;width:100%" data-tap="editWholeOrder" data-arg="${esc(g.orderNumber)}">Edit</div></div>` : ""}
           </div>
           <div class="col mt-2">${g.products.map((p) => productCard(c, p, false)).join("")}</div>
         </div>`).join("")}</div>`;
@@ -1495,19 +1519,22 @@
     const values = [replaceCommas(p.mrp), p.cases, p.pcs, replaceCommas(p.saleValue), p.orderedQty];
     if (!isReturnsTab && c.isDeliveryHop) { labels.push("Return Qty"); values.push(p.totalReturnQty); }
     const valCls = (i) => (isReturnsTab && i === 4 ? "c-danger" : "c-black");
-    const edit = !isReturnsTab && c.showEditButton ? `<div class="row pill-blue ml-1" style="width:70%;justify-content:center"><div class="lbl s11 tc w500 c-white ff-file p-1 vmid tc" style="height:40px;width:100%" data-tap="editProduct" data-arg="${esc(p.linkedOrderItemId)}">Edit</div></div>` : "";
+    // Edit pill: label w-[70%] of the 30% column, centred in it
+    const edit = !isReturnsTab && c.showEditButton ? `<div class="row pill-blue ay-t" style="width:calc((100% - 4px) * .7);justify-content:center"><div class="lbl s11 tc w500 c-white ff-file p-1 vmid tc" style="height:40px;width:100%" data-tap="editProduct" data-arg="${esc(p.linkedOrderItemId)}">Edit</div></div>` : "";
+    // image column is squeezed to the space left after the 70% label column (+ ml-5),
+    // so the 100x100 image is cut off on the right
     return `<div class="col bg-white r16 m-2 ${isReturnsTab ? "" : "p-2"}" style="${isReturnsTab ? "margin-bottom:8px" : ""}">
-      <div class="row mb-2 ${isReturnsTab ? "" : ""}">
+      <div class="row mb-2">
         <div class="row ${isReturnsTab ? "p-2" : "w70p"}">${W(p.name + " - MRP " + p.mrp, "s16 c-black w500 ff-file")}</div>
-        ${isReturnsTab ? "" : `<div class="row w30p mr-2" style="justify-content:center">${edit}</div>`}
+        ${isReturnsTab ? "" : `<div class="row w30p" style="justify-content:center">${edit}</div>`}
       </div>
-      <div class="row p-2 border-top-grey" style="overflow:hidden">
-        <div class="col w70p"><div class="row between">
+      <div class="row p-2 border-top-grey">
+        <div class="col" style="${pct(0.7)}"><div class="row between">
           <div class="col">${labels.map((l) => L(l, "c-secondary s14 w500 pt-1")).join("")}</div>
           <div class="col">${values.map((v, i) => L(v, `s14 ${valCls(i)} w500 pt-1 ax-r`)).join("")}</div>
         </div></div>
-        <div class="col ml-5" style="flex:1 1 auto;min-width:0;align-items:flex-end;justify-content:center">
-          <img src="${p.imageUrl}" class="bg-search r30 p-1 mr-1" style="width:100px;height:100px;object-fit:cover;flex:none;max-width:none">
+        <div class="col ml-5" style="${pct(0.29)}${CLAMP}justify-content:center;overflow:hidden">
+          <img src="${p.imageUrl}" class="bg-search" style="width:100px;height:100px;object-fit:cover;flex:none;max-width:none;border-radius:11.43px">
         </div>
       </div>
       ${!isReturnsTab && !c.isReturnHop ? `<div class="row mt-2 pt-2 border-top-grey">${W("Seller: " + p.sellerName, "s14 c-black w500 ay-c")}</div>` : ""}
@@ -1595,7 +1622,7 @@
     if (c.isLoading) return `<div class="fill col mt-2">${blockLoading()}</div>`;
     return `<div class="fill col mt-2">
       ${c.hopProducts && c.hopProducts.length === 0 ? emptyState("No return orders found.", false) : ""}
-      <div class="fill scroll" data-sk="returns">${c.hopProducts.map((p) => `<div class="px-2">${productCard(c, p, true)}</div>`).join("")}</div>
+      <div class="fill scroll" data-sk="returns">${c.hopProducts.map((p) => `<div class="col px-2">${productCard(c, p, true)}</div>`).join("")}</div>
     </div>`;
   }
 

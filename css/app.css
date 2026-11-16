@@ -20,16 +20,16 @@
 .app {
   font-family: "Roboto", sans-serif;
   font-size: 14px;
-  line-height: 1.172;
-  color: rgba(0, 0, 0, 0.54);           /* Android default TextView colour (textColorSecondary) */
-  background: #fafafa;                  /* AppTheme window background */
+  line-height: 1.327;               /* Android TextView with includeFontPadding: Roboto yMax..yMin */
+  color: #757575;                       /* Android default TextView colour (measured) */
+  background: #fff;                     /* page background behind un-styled areas (measured white) */
   -webkit-font-smoothing: antialiased;
   user-select: none;
   -webkit-user-select: none;
 }
 .app *, .app *::before, .app *::after { box-sizing: border-box; }
 .app img { display: block; -webkit-user-drag: none; }
-:where(.app) input { font-family: inherit; font-size: inherit; font-weight: inherit; line-height: 1.172; color: #000; border: 0; outline: 0; background: transparent; margin: 0; caret-color: #33b5e5; }
+:where(.app) input { font-family: inherit; font-size: inherit; font-weight: inherit; line-height: 1.327; color: #000; border: 0; outline: 0; background: transparent; margin: 0; caret-color: #33b5e5; }
 :where(.app) input::placeholder { color: rgba(0, 0, 0, 0.38); opacity: 1; }
 .app [data-tap] { cursor: pointer; }
 
@@ -61,6 +61,8 @@
 
 /* Label: single line + ellipsis unless textWrap="true" */
 .lbl { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* a Label stretched inside a horizontal StackLayout draws its text vertically centred */
+.row > .lbl:not(.ay-t):not(.ay-b) { align-self: center; }
 .wrap { white-space: normal; overflow-wrap: anywhere; }
 .tc { text-align: center; }
 .tr { text-align: right; }
@@ -95,7 +97,7 @@
 .w700 { font-weight: 700; } .w800 { font-weight: 800; } .w900 { font-weight: 900; }
 .ff-file { font-family: "NSRobotoFile", "Roboto", sans-serif; font-weight: 400; }
 .ff-file.fake-bold { -webkit-text-stroke: 0.35px currentColor; }
-.fas { font-family: "FA5Solid"; font-weight: 900; font-style: normal; line-height: 1.172; }
+.fas { font-family: "FA5Solid"; font-weight: 900; font-style: normal; line-height: 1.09; }
 
 .c-black { color: #000; }
 .c-white { color: #fff; }
@@ -105,7 +107,7 @@
 .c-danger { color: #ff3b30; }
 .c-gray400 { color: #9ca3af; }
 .c-grey { color: #d3d3d3; }
-.c-default { color: rgba(0, 0, 0, 0.54); }
+.c-default { color: #757575; }
 
 /* ---------- backgrounds ---------- */
 .bg-white { background-color: #fff; }
@@ -123,22 +125,25 @@
 .border-1-grey { border: 1px solid rgb(211, 210, 210); border-radius: 10px; }
 .border-1 { border: 1px solid #d6d4d4; border-radius: 10px; }
 .border-1x { border-style: solid; border-color: #d6d4d4; border-width: 0 1px 1px 0; }
-.border-b-2 { border-bottom: 2px solid #e5e7eb; }
-.r16 { border-radius: 16px; }
-.r20 { border-radius: 20px; }
-.r30 { border-radius: 30px; }
+.border-b-2 { border-bottom: 0.76px solid #e5e7eb; }
+.r16 { border-radius: 6.1px; }     /* rounded-lg = 16px physical */
+.r20 { border-radius: 7.62px; }    /* rounded-xl = 20px physical */
+.r30 { border-radius: 11.43px; }   /* br-30 = 30px physical */
 .rfull { border-radius: 9999px; }
 .clip { overflow: hidden; }
 
 /* ---------- shared components ---------- */
-.back-arrow { font-family: "FA5Solid"; font-weight: 900; font-size: 24px; color: #000; }
+.back-arrow { font-family: "FA5Solid"; font-weight: 900; font-size: 24px; color: #000; line-height: 1.09; }
 .title { padding-left: 8px; font-size: 18px; color: #114a97; font-weight: 800; }
-.tab { margin: 8px; padding: 8px; height: 40px; border-radius: 16px; font-size: 14px; font-weight: 500; display: flex; flex-direction: column; justify-content: center; }
+.tab { padding: 8px; height: 40px; border-radius: 6.1px; font-size: 14px; font-weight: 500; display: flex; flex-direction: column; justify-content: center; }
+/* tab pills: 8 dp row padding, 16 dp between pills, the last pill takes what is left */
+.tabs-row { gap: 16px; padding: 16px 8px; }  /* p-2 + the pills' own m-2 top and bottom */
+.tabs-row > .tab:last-child { flex: 0 1 auto; min-width: 0; }
 .tab.on { background: #114a97; color: #fff; }
-.tab.off { background: #fff; color: #000; border: 1px solid #373535; border-radius: 30px; }
+.tab.off { background: #fff; color: #000; border: 1px solid #373535; border-radius: 11.43px; }
 
 /* GridLayout-style buttons (primary-btn3 / primary-btn2 / secondary-btn2) */
-.gbtn { display: flex; align-items: center; justify-content: center; border-radius: 30px; color: #fff; align-self: center; }
+.gbtn { display: flex; align-items: center; justify-content: center; border-radius: 11.43px; color: #fff; align-self: center; }
 .gbtn.p3 { background: #114a97; width: 85%; padding: 4px 24px; font-weight: 500; margin-top: 20px; }
 .gbtn.p2 { background: #114a97; width: 80%; padding: 0 24px; font-weight: 400; }
 .gbtn.s2 { background: #8d8d8d; width: 80%; padding: 0 24px; font-weight: 400; }
@@ -147,18 +152,16 @@
 /* native Android Button (elevated, text-transform none) */
 .nbtn {
   display: flex; align-items: center; justify-content: center; text-align: center;
-  min-height: 48px; border-radius: 30px; color: #fff; font-size: 16px; font-weight: 400;
+  min-height: 48px; border-radius: 11.43px; color: #fff; font-size: 16px; font-weight: 400;
   align-self: center; padding: 12px 24px; line-height: 1.172; border: 0;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px rgba(0, 0, 0, 0.2);
-  transition: box-shadow .15s;
 }
 .nbtn.p2 { background: #114a97; width: 80%; }
 .nbtn.s2 { background: #8d8d8d; width: 80%; }
-.nbtn.p2:active { background: rgba(17, 74, 151, 0.3); box-shadow: 0 4px 5px rgba(0, 0, 0, .14), 0 1px 10px rgba(0, 0, 0, .12), 0 2px 4px -1px rgba(0, 0, 0, .3); }
+.nbtn.p2:active { background: rgba(17, 74, 151, 0.3); }
 .nbtn.px-2 { padding-left: 8px; padding-right: 8px; }
 
-.pill-blue { background: #2563eb; color: #fff; border-radius: 30px; }
-.action-pill { height: 32px; background: #fff; border: 1px solid #d6d4d4; border-radius: 30px; }
+.pill-blue { background: #2563eb; color: #fff; border-radius: 11.43px; }
+.action-pill { height: 32px; background: #fff; border: 1px solid #d6d4d4; border-radius: 11.43px; }
 
 /* ActivityIndicator (Android indeterminate ProgressBar) */
 .spinner { width: 48px; height: 48px; position: relative; color: #000; }
@@ -172,13 +175,13 @@
 }
 
 /* TextFields */
-.tf { display: block; width: 100%; padding: 10px 4px 10px 4px; font-size: 14px; color: #000; min-width: 0; }
+.tf { display: block; width: 100%; padding: 11px 4px 11px 4px; font-size: 14px; color: #000; min-width: 0; }
 .otp-box {
   width: 100%; text-align: center; border: 1px solid #e0e4e5; background: #f5f8f9; color: #000;
-  font-size: 12px; font-weight: 500; padding: 10px 2px; border-radius: 16px; height: 40px;
+  font-size: 12px; font-weight: 500; padding: 9px 2px; border-radius: 6.1px; height: 39px;
 }
 .otp-box.sq { border-radius: 0; }
-.otp-box:focus { background: #fff; border-color: #000; font-size: 14px; border-radius: 16px; }
+.otp-box:focus { background: #fff; border-color: #000; font-size: 14px; border-radius: 6.1px; }
 
 /* Android Switch (thumb tinted by `color`, track from colorAccent) */
 .nsswitch { width: 50px; height: 32px; position: relative; flex: none; }
@@ -195,11 +198,11 @@
 .footer .item { display: flex; flex-direction: column; padding: 8px 0; }
 .footer .item img { width: 24px; height: 24px; align-self: center; object-fit: contain; }
 .footer .item .lbl { font-size: 12px; font-weight: 500; padding-top: 4px; text-align: center; }
-.subfooter { display: flex; justify-content: space-around; align-items: flex-end; padding: 8px 0; border-top: 1px solid #ecf0f1; flex: none; }
+.subfooter { display: flex; justify-content: space-around; align-items: flex-end; padding: 8px 0; border-top: 1px solid #ecf0f1; flex: none; background: #fff; }
 .subfooter .item { display: flex; flex-direction: column; }
 
 /* ---------- ActionBar (web view) ---------- */
-.actionbar { height: 56px; background: #f5f5f5; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0, 0, 0, .24); position: relative; z-index: 2; flex: none; }
+.actionbar { height: 56px; background: #f5f5f5; display: flex; align-items: center; box-shadow: 0 1px 2px rgba(0, 0, 0, .12); position: relative; z-index: 2; flex: none; }
 .actionbar .nav { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; }
 
 /* ============================================================
@@ -216,7 +219,23 @@
 
 /* SweetAlert (TNSFancyAlert on Android) */
 .sa-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
-.sa-dim { position: absolute; inset: 0; background: rgba(0, 0, 0, .6); }
+.sa-dim { position: absolute; inset: 0; background: rgba(0, 0, 0, .4); }
+/* TNSFancyAlert (measured from the Pixel 10 reference) */
+.fa { position: relative; width: 288px; background: #fff; border-radius: 7.6px; overflow: hidden; display: flex; flex-direction: column; padding-bottom: 10px; animation: fa-in .22s ease-out; }
+@keyframes fa-in { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.fa-head { position: relative; height: 85px; flex: none; }
+.fa-band { position: absolute; inset: 0; width: 100%; height: 100%; }
+.fa-success .fa-band path { fill: #8faf6c; }
+.fa-warning .fa-band path { fill: #e9bc4c; }
+.fa-error .fa-band path { fill: #ee7b63; }
+.fa-icon { position: absolute; left: 50%; top: 10px; width: 49px; height: 49px; margin-left: -24.5px; }
+.fa-title { font-size: 18px; font-weight: 700; color: #333; text-align: center; margin-top: 18px; line-height: 1.327; padding: 0 20px; }
+.fa-text { font-size: 14px; color: #333; text-align: left; margin-top: 10px; line-height: 1.19; padding: 0 20px; }
+.fa-btn { margin: 15px 15.2px 0; height: 39.2px; border-radius: 7.6px; border: 1.1px solid; display: flex; align-items: center; justify-content: center; font-size: 15px; background: #fff; }
+.fa-success .fa-btn { border-color: #8faf6c; color: #8faf6c; }
+.fa-warning .fa-btn { border-color: #e9bc4c; color: #e9bc4c; }
+.fa-error .fa-btn { border-color: #ee7b63; color: #ee7b63; }
+.fa-btn:active { background: #f4f4f4; }
 .sa { position: relative; width: 290px; background: #fff; border-radius: 6px; padding: 10px 10px 18px; display: flex; flex-direction: column; align-items: center; animation: sa-in .3s; }
 @keyframes sa-in { 0% { transform: scale(.7); opacity: 0; } 45% { transform: scale(1.05); opacity: 1; } 80% { transform: scale(.95); } 100% { transform: scale(1); } }
 .sa-icon { width: 53px; height: 53px; margin-top: 18px; }
@@ -232,20 +251,25 @@
 .sa-pulse { animation: sa-pulse .75s; }
 @keyframes sa-pulse { 0% { transform: scale(.6); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
 
-/* Android AlertDialog (dialogs.confirm) */
-.ad { position: relative; width: 280px; background: #fff; border-radius: 4px; box-shadow: 0 11px 15px -7px rgba(0, 0, 0, .2), 0 24px 38px 3px rgba(0, 0, 0, .14); padding: 24px 0 8px; }
-.ad-msg { padding: 0 24px 20px; font-size: 16px; color: rgba(0, 0, 0, .87); line-height: 1.4; }
-.ad-btns { display: flex; justify-content: flex-end; padding: 0 8px; gap: 8px; }
-.ad-btns div { color: #33b5e5; font-weight: 500; font-size: 14px; text-transform: uppercase; padding: 10px 8px; min-width: 64px; text-align: center; letter-spacing: .3px; }
+/* Android AlertDialog (dialogs.confirm) — measured from reference 91 */
+.ad-dim { background: rgba(0, 0, 0, .55); }
+.ad { position: relative; width: 357px; background: #fff; border-radius: 2px; box-shadow: 0 11px 15px -7px rgba(0, 0, 0, .2), 0 24px 38px 3px rgba(0, 0, 0, .14); padding: 22px 0 10px; }
+.ad-msg { padding: 0 24px 18px; font-size: 16px; color: #333; line-height: 1.327; }
+.ad-btns { display: flex; justify-content: flex-end; padding: 0 23px 0 12px; gap: 24px; }
+.ad-btns div { color: #4a5ef0; font-weight: 500; font-size: 14px; text-transform: uppercase; padding: 10px 12px; min-width: 50px; text-align: center; letter-spacing: .4px; padding-left: 8px; padding-right: 8px; min-width: 0; }
 
-/* LoadingIndicator */
+/* LoadingIndicator (horizontal progress style) — reference 08 */
 .ld-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, .5); }
-.ld { background: #fff; border-radius: 8px; padding: 18px 22px; min-width: 120px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 12px rgba(0, 0, 0, .25); }
-.ld .spinner { color: #3f51b5; width: 44px; height: 44px; }
-.ld-msg { margin-top: 12px; font-size: 14px; color: #000; text-align: center; }
+.ld { background: #fff; border-radius: 2px; padding: 16px 10px 12px; min-width: 117px; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 4px 12px rgba(0, 0, 0, .25); }
+.ld-bar { height: 3px; background: rgba(63, 81, 181, .25); position: relative; overflow: hidden; }
+.ld-bar span { position: absolute; top: 0; bottom: 0; left: 0; width: 30%; background: #3f51b5; animation: ld-bar 1.6s ease-in-out infinite; }
+@keyframes ld-bar { 0% { left: -30%; width: 30%; } 60% { left: 60%; width: 50%; } 100% { left: 110%; width: 30%; } }
+.ld-msg { margin-top: 10px; font-size: 14px; color: #3f51b5; text-align: left; line-height: 1.327; }
 
-/* Toast */
-.toast { position: absolute; left: 50%; bottom: 64px; transform: translateX(-50%); max-width: 300px; background: #323232; color: #fff; font-size: 14px; line-height: 1.35; padding: 12px 18px; border-radius: 22px; text-align: center; opacity: 0; transition: opacity .2s; pointer-events: none; box-shadow: 0 2px 6px rgba(0, 0, 0, .3); }
+/* Toast (Android 12+ system toast) — reference 16 */
+.toast { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); max-width: 330px; display: flex; align-items: center; gap: 10px; white-space: nowrap; background: #eeedf3; color: #333; font-size: 14px; line-height: 1.3; padding: 10px 16px 10px 12px; border-radius: 22px; opacity: 0; transition: opacity .2s; pointer-events: none; box-shadow: 0 2px 6px rgba(0, 0, 0, .25); }
+.toast img { width: 24px; height: 24px; border-radius: 6px; flex: none; }
+.toast span { white-space: normal; }
 .toast.in { opacity: 1; }
 
 /* Snackbar */
@@ -253,15 +277,20 @@
 .snack.in { transform: translateY(0); }
 .snack .act { color: #ff4081; font-weight: 500; text-transform: uppercase; margin-left: 16px; font-size: 14px; }
 
-/* Location permission (Android 12+ style) */
-.perm { position: relative; width: 312px; background: #f3f0f7; border-radius: 28px; padding: 24px; display: flex; flex-direction: column; align-items: center; }
-.perm-ico { width: 24px; height: 24px; color: #4b5b92; }
-.perm-title { font-size: 20px; color: #1b1b1f; text-align: center; margin-top: 16px; line-height: 1.3; }
-.perm-maps { display: flex; gap: 32px; margin: 20px 0 8px; }
-.perm-maps .opt { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 14px; color: #1b1b1f; }
-.perm-maps .map { width: 88px; height: 88px; border-radius: 50%; background: radial-gradient(circle at 50% 50%, #c9dcff 0 18%, #e3ecff 19% 100%); border: 3px solid transparent; }
-.perm-maps .opt.sel .map { border-color: #4b5b92; }
-.perm-btn { width: 100%; text-align: center; background: #dfe2f9; color: #1b1b1f; border-radius: 20px; padding: 11px; margin-top: 8px; font-size: 14px; font-weight: 500; }
+/* Location permission (Android 16, system dark theme) — reference 36 */
+.perm-dim { background: rgba(0, 0, 0, .55); }
+.perm { position: relative; width: 357px; background: #3d4045; border-radius: 28px; padding: 26px 24px 20px; display: flex; flex-direction: column; align-items: center; }
+.perm-ico { width: 26px; height: 26px; color: #a6b8e8; }
+.perm-title { font-size: 23px; color: #e3e3e6; text-align: center; margin-top: 14px; line-height: 1.38; padding: 0 12px; }
+.perm-title b { font-weight: 700; color: #fff; }
+.perm-maps { display: flex; gap: 12px; margin: 22px 0 14px; width: 100%; }
+.perm-maps .opt { flex: 1; border-radius: 14px; background: #2c2f34; border: 2.5px solid transparent; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+.perm-maps .opt.sel { background: #4b5578; border-color: #c3cdf5; }
+.perm-maps .opt-h { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #e3e3e6; }
+.perm-maps .chk { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #c4c6d0; flex: none; }
+.perm-maps .opt.sel .chk { background: #c3cdf5 radial-gradient(circle, #4b5578 0 0); border-color: #c3cdf5; box-shadow: inset 0 0 0 3px #c3cdf5; }
+.perm-maps .pmap { width: 100%; height: auto; display: block; }
+.perm-btn { width: 100%; text-align: center; background: #c2cbf0; color: #2a3350; border-radius: 24px; height: 48px; display: flex; align-items: center; justify-content: center; margin-top: 8px; font-size: 14px; font-weight: 500; }
 
 /* Dialer (TNSPhone.dial → Android Phone app) */
 .dialer { position: absolute; inset: 0; background: #fff; display: flex; flex-direction: column; align-items: center; font-family: "Roboto"; }

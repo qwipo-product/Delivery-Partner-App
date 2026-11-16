@@ -7,10 +7,15 @@
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
+  const params = new URLSearchParams(location.search);
+  const bare = params.has("bare");
+  if (bare) document.body.classList.add("bare");
+
   // ---------- fit the phone to the window ----------
   const scaleBox = $("#deviceScale");
   const device = $("#device");
   function fit() {
+    if (bare) { scaleBox.style.transform = "none"; return; }
     const w = device.offsetWidth;
     const h = device.offsetHeight;
     const narrow = window.innerWidth <= 900;
@@ -27,7 +32,7 @@
   // ---------- status bar clock ----------
   function tick() {
     const d = new Date();
-    $("#sbTime").textContent = `${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`;
+    $("#sbTime").textContent = `${d.getHours() % 12 || 12}:${String(d.getMinutes()).padStart(2, "0")}`;
   }
   tick();
   setInterval(tick, 15000);
@@ -35,7 +40,6 @@
   // ---------- navigation bar ----------
   $("#navBack").addEventListener("click", () => C.back());
   $("#navHome").addEventListener("click", () => C.home());
-  $("#navRecents").addEventListener("click", () => C.recents());
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") { e.preventDefault(); C.back(); }
   });
