@@ -1,0 +1,280 @@
+/* ============================================================
+   Qwipo DP replica – app styles
+   1 CSS px = 1 Android dp. Values come from src/app.android.scss
+   and tailwind.config.js of qwipo-delivery-partners (main).
+   ============================================================ */
+
+@font-face { font-family: "Roboto"; src: url(../assets/fonts/Roboto-Thin.ttf); font-weight: 100; }
+@font-face { font-family: "Roboto"; src: url(../assets/fonts/Roboto-Light.ttf); font-weight: 200; }
+@font-face { font-family: "Roboto"; src: url(../assets/fonts/Roboto-Light.ttf); font-weight: 300; }
+@font-face { font-family: "Roboto"; src: url(../assets/fonts/Roboto-Regular.ttf); font-weight: 400; }
+@font-face { font-family: "Roboto"; src: url(../assets/fonts/Roboto-Medium.ttf); font-weight: 500; }
+@font-face { font-family: "Roboto"; src: url(../assets/fonts/Roboto-Medium.ttf); font-weight: 600; }
+@font-face { font-family: "Roboto"; src: url(../assets/fonts/Roboto-Bold.ttf); font-weight: 700; }
+@font-face { font-family: "Roboto"; src: url(../assets/fonts/Roboto-Bold.ttf); font-weight: 800; }
+@font-face { font-family: "Roboto"; src: url(../assets/fonts/Roboto-Black.ttf); font-weight: 900; }
+/* `font-sans` / `font-serif` resolve to fonts/Roboto.ttf in the app, which is Roboto Black */
+@font-face { font-family: "NSRobotoFile"; src: url(../assets/fonts/Roboto-NSFile.ttf); font-weight: 100 900; }
+@font-face { font-family: "FA5Solid"; src: url(../assets/fonts/fa-solid-900.woff2) format("woff2"); font-weight: 900; }
+
+.app {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  line-height: 1.172;
+  color: rgba(0, 0, 0, 0.54);           /* Android default TextView colour (textColorSecondary) */
+  background: #fafafa;                  /* AppTheme window background */
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.app *, .app *::before, .app *::after { box-sizing: border-box; }
+.app img { display: block; -webkit-user-drag: none; }
+:where(.app) input { font-family: inherit; font-size: inherit; font-weight: inherit; line-height: 1.172; color: #000; border: 0; outline: 0; background: transparent; margin: 0; caret-color: #33b5e5; }
+:where(.app) input::placeholder { color: rgba(0, 0, 0, 0.38); opacity: 1; }
+.app [data-tap] { cursor: pointer; }
+
+/* ---------- layout primitives (NativeScript layouts) ---------- */
+.page { position: absolute; inset: 0; display: flex; flex-direction: column; overflow: hidden; }
+.col { display: flex; flex-direction: column; align-items: stretch; min-width: 0; }
+.row { display: flex; flex-direction: row; align-items: stretch; min-width: 0; }
+.row > * { flex: none; }
+.cell { display: grid; grid-template-columns: minmax(0, 1fr); }
+.cell > * { grid-area: 1 / 1; }
+.cell > .ax-r { justify-self: end; }
+.cell > .ax-l { justify-self: start; }
+.cell > .ax-c { justify-self: center; }
+.fill { flex: 1 1 auto; min-height: 0; }
+.scroll { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+.ax-c { align-self: center; }
+.ax-r { align-self: flex-end; }
+.ax-l { align-self: flex-start; }
+.ay-c { align-self: center; }
+.ay-t { align-self: flex-start; }
+.ay-b { align-self: flex-end; }
+.center-box { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.between { justify-content: space-between; }
+.around { justify-content: space-around; }
+.items-end { align-items: flex-end; }
+.items-center { align-items: center; }
+.relative { position: relative; }
+
+/* Label: single line + ellipsis unless textWrap="true" */
+.lbl { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wrap { white-space: normal; overflow-wrap: anywhere; }
+.tc { text-align: center; }
+.tr { text-align: right; }
+.tl { text-align: left; }
+.vmid { display: flex; align-items: center; }
+.vmid.tc { justify-content: center; }
+
+/* ---------- sizes / widths ---------- */
+.w-full { width: 100%; }
+.w20p { width: 20%; } .w25p { width: 25%; } .w29p { width: 29%; } .w30p { width: 30%; } .w32p { width: 32%; }
+.w40p { width: 40%; } .w48p { width: 48%; } .w50p { width: 50%; } .w60p { width: 60%; } .w65p { width: 65%; }
+.w70p { width: 70%; } .w75p { width: 75%; } .w80p { width: 80%; } .w85p { width: 85%; } .w98p { width: 98%; }
+
+/* ---------- spacing (tailwind scale; unitless NS values = dp) ---------- */
+.p-1 { padding: 4px; } .p-2 { padding: 8px; } .p-3 { padding: 12px; } .p-4 { padding: 16px; } .p-5 { padding: 20px; }
+.px-2 { padding-left: 8px; padding-right: 8px; } .px-3 { padding-left: 12px; padding-right: 12px; } .px-4 { padding-left: 16px; padding-right: 16px; } .px-5 { padding-left: 20px; padding-right: 20px; } .px-6 { padding-left: 24px; padding-right: 24px; }
+.py-1 { padding-top: 4px; padding-bottom: 4px; }
+.pt-1 { padding-top: 4px; } .pt-2 { padding-top: 8px; } .pt-3 { padding-top: 12px; } .pt-5 { padding-top: 20px; } .pt-10 { padding-top: 40px; }
+.pb-1 { padding-bottom: 4px; } .pb-2 { padding-bottom: 8px; } .pb-4 { padding-bottom: 16px; } .pb-5 { padding-bottom: 20px; } .pb-10 { padding-bottom: 40px; }
+.pl-1 { padding-left: 4px; } .pl-2 { padding-left: 8px; } .pl-3 { padding-left: 12px; } .pl-4 { padding-left: 16px; } .pl-5 { padding-left: 20px; } .pl-20 { padding-left: 80px; }
+.pr-1 { padding-right: 4px; } .pr-2 { padding-right: 8px; }
+.m-2 { margin: 8px; } .m-5 { margin: 20px; } .mx-2 { margin-left: 8px; margin-right: 8px; } .mx-5 { margin-left: 20px; margin-right: 20px; }
+.mt-1 { margin-top: 4px; } .mt-2 { margin-top: 8px; } .mt-4 { margin-top: 16px; } .mt-5 { margin-top: 20px; } .mt-10 { margin-top: 40px; } .mt-20 { margin-top: 80px; }
+.mb-1 { margin-bottom: 4px; } .mb-2 { margin-bottom: 8px; } .mb-30 { margin-bottom: 30px; }
+.ml-1 { margin-left: 4px; } .ml-2 { margin-left: 8px; } .ml-4 { margin-left: 16px; } .ml-5 { margin-left: 20px; }
+.mr-1 { margin-right: 4px; } .mr-2 { margin-right: 8px; } .mr-3 { margin-right: 12px; } .mr-5 { margin-right: 20px; }
+
+/* ---------- typography ---------- */
+.s10 { font-size: 10px; } .s11 { font-size: 11px; } .s12 { font-size: 12px; } .s14 { font-size: 14px; } .s16 { font-size: 16px; }
+.s18 { font-size: 18px; } .s20 { font-size: 20px; } .s22 { font-size: 22px; } .s24 { font-size: 24px; } .s50 { font-size: 50px; }
+.w100 { font-weight: 100; } .w300 { font-weight: 300; } .w400 { font-weight: 400; } .w500 { font-weight: 500; } .w600 { font-weight: 600; }
+.w700 { font-weight: 700; } .w800 { font-weight: 800; } .w900 { font-weight: 900; }
+.ff-file { font-family: "NSRobotoFile", "Roboto", sans-serif; font-weight: 400; }
+.ff-file.fake-bold { -webkit-text-stroke: 0.35px currentColor; }
+.fas { font-family: "FA5Solid"; font-weight: 900; font-style: normal; line-height: 1.172; }
+
+.c-black { color: #000; }
+.c-white { color: #fff; }
+.c-secondary { color: #4f4f4f; }
+.c-info { color: #114a97; }
+.c-muted { color: #9a9a9a; }
+.c-danger { color: #ff3b30; }
+.c-gray400 { color: #9ca3af; }
+.c-grey { color: #d3d3d3; }
+.c-default { color: rgba(0, 0, 0, 0.54); }
+
+/* ---------- backgrounds ---------- */
+.bg-white { background-color: #fff; }
+.bg-search { background-color: #f4f4f4; }
+.bg-info { background-color: #114a97; }
+.bg-primary { background-color: #2563eb; }
+.bg-accent { background-color: #a54dfe; }
+.bg-black { background-color: #000; }
+.bg-8d { background-color: #8d8d8d; }
+
+/* ---------- borders / radii ---------- */
+.border-top-grey { border-top: 1px solid #ecf0f1; }
+.border-top { border-top: 1px solid #888888; }
+.border-bottom { border-bottom: 1px solid #888888; }
+.border-1-grey { border: 1px solid rgb(211, 210, 210); border-radius: 10px; }
+.border-1 { border: 1px solid #d6d4d4; border-radius: 10px; }
+.border-1x { border-style: solid; border-color: #d6d4d4; border-width: 0 1px 1px 0; }
+.border-b-2 { border-bottom: 2px solid #e5e7eb; }
+.r16 { border-radius: 16px; }
+.r20 { border-radius: 20px; }
+.r30 { border-radius: 30px; }
+.rfull { border-radius: 9999px; }
+.clip { overflow: hidden; }
+
+/* ---------- shared components ---------- */
+.back-arrow { font-family: "FA5Solid"; font-weight: 900; font-size: 24px; color: #000; }
+.title { padding-left: 8px; font-size: 18px; color: #114a97; font-weight: 800; }
+.tab { margin: 8px; padding: 8px; height: 40px; border-radius: 16px; font-size: 14px; font-weight: 500; display: flex; flex-direction: column; justify-content: center; }
+.tab.on { background: #114a97; color: #fff; }
+.tab.off { background: #fff; color: #000; border: 1px solid #373535; border-radius: 30px; }
+
+/* GridLayout-style buttons (primary-btn3 / primary-btn2 / secondary-btn2) */
+.gbtn { display: flex; align-items: center; justify-content: center; border-radius: 30px; color: #fff; align-self: center; }
+.gbtn.p3 { background: #114a97; width: 85%; padding: 4px 24px; font-weight: 500; margin-top: 20px; }
+.gbtn.p2 { background: #114a97; width: 80%; padding: 0 24px; font-weight: 400; }
+.gbtn.s2 { background: #8d8d8d; width: 80%; padding: 0 24px; font-weight: 400; }
+.gbtn.p3:active, .gbtn.p2:active { background: rgba(17, 74, 151, 0.3); }
+
+/* native Android Button (elevated, text-transform none) */
+.nbtn {
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  min-height: 48px; border-radius: 30px; color: #fff; font-size: 16px; font-weight: 400;
+  align-self: center; padding: 12px 24px; line-height: 1.172; border: 0;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px rgba(0, 0, 0, 0.2);
+  transition: box-shadow .15s;
+}
+.nbtn.p2 { background: #114a97; width: 80%; }
+.nbtn.s2 { background: #8d8d8d; width: 80%; }
+.nbtn.p2:active { background: rgba(17, 74, 151, 0.3); box-shadow: 0 4px 5px rgba(0, 0, 0, .14), 0 1px 10px rgba(0, 0, 0, .12), 0 2px 4px -1px rgba(0, 0, 0, .3); }
+.nbtn.px-2 { padding-left: 8px; padding-right: 8px; }
+
+.pill-blue { background: #2563eb; color: #fff; border-radius: 30px; }
+.action-pill { height: 32px; background: #fff; border: 1px solid #d6d4d4; border-radius: 30px; }
+
+/* ActivityIndicator (Android indeterminate ProgressBar) */
+.spinner { width: 48px; height: 48px; position: relative; color: #000; }
+.spinner svg { width: 100%; height: 100%; animation: sp-rot 1.4s linear infinite; }
+.spinner circle { stroke: currentColor; stroke-linecap: square; fill: none; stroke-width: 4; stroke-dasharray: 1, 200; stroke-dashoffset: 0; animation: sp-dash 1.4s ease-in-out infinite; }
+@keyframes sp-rot { 100% { transform: rotate(360deg); } }
+@keyframes sp-dash {
+  0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 89, 200; stroke-dashoffset: -35px; }
+  100% { stroke-dasharray: 89, 200; stroke-dashoffset: -124px; }
+}
+
+/* TextFields */
+.tf { display: block; width: 100%; padding: 10px 4px 10px 4px; font-size: 14px; color: #000; min-width: 0; }
+.otp-box {
+  width: 100%; text-align: center; border: 1px solid #e0e4e5; background: #f5f8f9; color: #000;
+  font-size: 12px; font-weight: 500; padding: 10px 2px; border-radius: 16px; height: 40px;
+}
+.otp-box.sq { border-radius: 0; }
+.otp-box:focus { background: #fff; border-color: #000; font-size: 14px; border-radius: 16px; }
+
+/* Android Switch (thumb tinted by `color`, track from colorAccent) */
+.nsswitch { width: 50px; height: 32px; position: relative; flex: none; }
+.nsswitch .track { position: absolute; left: 9px; right: 9px; top: 9px; height: 14px; border-radius: 7px; background: rgba(0, 0, 0, 0.38); transition: background .15s; }
+.nsswitch .thumb { position: absolute; top: 6px; left: 5px; width: 20px; height: 20px; border-radius: 50%; background: #2563eb; box-shadow: 0 1px 3px rgba(0, 0, 0, .4); transition: left .15s; }
+.nsswitch.on .track { background: rgba(51, 181, 229, 0.5); }
+.nsswitch.on .thumb { left: 25px; }
+
+/* ListView rows tap ripple-ish */
+.press:active { opacity: .7; }
+
+/* ---------- footer bar ---------- */
+.footer { display: flex; flex-direction: row; justify-content: space-around; align-items: flex-end; background: #fff; border-top: 1px solid #ecf0f1; flex: none; }
+.footer .item { display: flex; flex-direction: column; padding: 8px 0; }
+.footer .item img { width: 24px; height: 24px; align-self: center; object-fit: contain; }
+.footer .item .lbl { font-size: 12px; font-weight: 500; padding-top: 4px; text-align: center; }
+.subfooter { display: flex; justify-content: space-around; align-items: flex-end; padding: 8px 0; border-top: 1px solid #ecf0f1; flex: none; }
+.subfooter .item { display: flex; flex-direction: column; }
+
+/* ---------- ActionBar (web view) ---------- */
+.actionbar { height: 56px; background: #f5f5f5; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0, 0, 0, .24); position: relative; z-index: 2; flex: none; }
+.actionbar .nav { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; }
+
+/* ============================================================
+   Overlays: bottom sheet (RootLayout), alerts, toast, loader
+   ============================================================ */
+.ov { position: absolute; inset: 0; }
+.shade { position: absolute; inset: 0; background: #000; opacity: 0; transition: opacity .3s; }
+.shade.in { opacity: .7; }
+.sheet-view { position: absolute; inset: 0; display: flex; flex-direction: column; transform: translateY(500px); transition: transform .3s cubic-bezier(0.17, 0.89, 0.24, 1.11); }
+.sheet-view.in { transform: translateY(0); }
+.sheet-close { height: 20%; display: flex; flex-direction: column; justify-content: center; align-items: center; flex: none; }
+.sheet-close .circle { width: 40px; height: 40px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; }
+.sheet-body { margin-top: auto; background: #fff; border-radius: 25px 25px 0 0; overflow: hidden; display: flex; flex-direction: column; }
+
+/* SweetAlert (TNSFancyAlert on Android) */
+.sa-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.sa-dim { position: absolute; inset: 0; background: rgba(0, 0, 0, .6); }
+.sa { position: relative; width: 290px; background: #fff; border-radius: 6px; padding: 10px 10px 18px; display: flex; flex-direction: column; align-items: center; animation: sa-in .3s; }
+@keyframes sa-in { 0% { transform: scale(.7); opacity: 0; } 45% { transform: scale(1.05); opacity: 1; } 80% { transform: scale(.95); } 100% { transform: scale(1); } }
+.sa-icon { width: 53px; height: 53px; margin-top: 18px; }
+.sa-title { font-size: 19px; color: #575757; margin-top: 19px; text-align: center; padding: 0 10px; font-family: "Roboto"; }
+.sa-text { font-size: 14px; color: #797979; margin-top: 10px; text-align: center; padding: 0 12px; line-height: 1.3; }
+.sa-btn { margin-top: 18px; min-width: 90px; height: 36px; padding: 0 21px; border-radius: 4px; color: #fff; font-size: 17px; display: flex; align-items: center; justify-content: center; }
+.sa-btn.blue { background: #aedef4; }
+.sa-btn.blue:active { background: #96bfd2; }
+.sa-btn.red { background: #dd6b55; }
+.sa-btn.red:active { background: #ad5545; }
+.sa-check path { stroke-dasharray: 60; stroke-dashoffset: 60; animation: sa-draw .5s .2s forwards; }
+@keyframes sa-draw { to { stroke-dashoffset: 0; } }
+.sa-pulse { animation: sa-pulse .75s; }
+@keyframes sa-pulse { 0% { transform: scale(.6); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+/* Android AlertDialog (dialogs.confirm) */
+.ad { position: relative; width: 280px; background: #fff; border-radius: 4px; box-shadow: 0 11px 15px -7px rgba(0, 0, 0, .2), 0 24px 38px 3px rgba(0, 0, 0, .14); padding: 24px 0 8px; }
+.ad-msg { padding: 0 24px 20px; font-size: 16px; color: rgba(0, 0, 0, .87); line-height: 1.4; }
+.ad-btns { display: flex; justify-content: flex-end; padding: 0 8px; gap: 8px; }
+.ad-btns div { color: #33b5e5; font-weight: 500; font-size: 14px; text-transform: uppercase; padding: 10px 8px; min-width: 64px; text-align: center; letter-spacing: .3px; }
+
+/* LoadingIndicator */
+.ld-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, .5); }
+.ld { background: #fff; border-radius: 8px; padding: 18px 22px; min-width: 120px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 12px rgba(0, 0, 0, .25); }
+.ld .spinner { color: #3f51b5; width: 44px; height: 44px; }
+.ld-msg { margin-top: 12px; font-size: 14px; color: #000; text-align: center; }
+
+/* Toast */
+.toast { position: absolute; left: 50%; bottom: 64px; transform: translateX(-50%); max-width: 300px; background: #323232; color: #fff; font-size: 14px; line-height: 1.35; padding: 12px 18px; border-radius: 22px; text-align: center; opacity: 0; transition: opacity .2s; pointer-events: none; box-shadow: 0 2px 6px rgba(0, 0, 0, .3); }
+.toast.in { opacity: 1; }
+
+/* Snackbar */
+.snack { position: absolute; left: 0; right: 0; bottom: 0; min-height: 48px; background: #000; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; font-size: 14px; transform: translateY(100%); transition: transform .25s; }
+.snack.in { transform: translateY(0); }
+.snack .act { color: #ff4081; font-weight: 500; text-transform: uppercase; margin-left: 16px; font-size: 14px; }
+
+/* Location permission (Android 12+ style) */
+.perm { position: relative; width: 312px; background: #f3f0f7; border-radius: 28px; padding: 24px; display: flex; flex-direction: column; align-items: center; }
+.perm-ico { width: 24px; height: 24px; color: #4b5b92; }
+.perm-title { font-size: 20px; color: #1b1b1f; text-align: center; margin-top: 16px; line-height: 1.3; }
+.perm-maps { display: flex; gap: 32px; margin: 20px 0 8px; }
+.perm-maps .opt { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 14px; color: #1b1b1f; }
+.perm-maps .map { width: 88px; height: 88px; border-radius: 50%; background: radial-gradient(circle at 50% 50%, #c9dcff 0 18%, #e3ecff 19% 100%); border: 3px solid transparent; }
+.perm-maps .opt.sel .map { border-color: #4b5b92; }
+.perm-btn { width: 100%; text-align: center; background: #dfe2f9; color: #1b1b1f; border-radius: 20px; padding: 11px; margin-top: 8px; font-size: 14px; font-weight: 500; }
+
+/* Dialer (TNSPhone.dial → Android Phone app) */
+.dialer { position: absolute; inset: 0; background: #fff; display: flex; flex-direction: column; align-items: center; font-family: "Roboto"; }
+.dialer .num { margin-top: 140px; font-size: 32px; color: #202124; letter-spacing: 1px; }
+.dialer .pad { display: grid; grid-template-columns: repeat(3, 72px); gap: 14px 30px; margin-top: auto; }
+.dialer .key { width: 72px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 28px; color: #202124; }
+.dialer .key small { font-size: 10px; color: #5f6368; letter-spacing: 1px; }
+.dialer .call { width: 64px; height: 64px; border-radius: 50%; background: #1e8e3e; margin: 24px 0 36px; display: flex; align-items: center; justify-content: center; }
+
+/* Splash + launcher */
+.splash { position: absolute; inset: 0; background: #a77ce8 url(../assets/splash.png) center / 100% 100% no-repeat; }
+.launcher { position: absolute; inset: 0; background: linear-gradient(180deg, #1f2b3a, #0f1720); display: flex; flex-direction: column; align-items: center; padding-top: 220px; font-family: "Roboto"; }
+.launcher .appicon { width: 64px; height: 64px; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 10px rgba(0, 0, 0, .4); cursor: pointer; }
+.launcher .appicon img { width: 100%; height: 100%; }
+.launcher .name { color: #fff; font-size: 13px; margin-top: 8px; }
+.launcher .hint { color: rgba(255, 255, 255, .55); font-size: 12px; margin-top: 28px; text-align: center; padding: 0 40px; line-height: 1.4; }
