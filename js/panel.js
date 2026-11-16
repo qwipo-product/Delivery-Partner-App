@@ -11,22 +11,34 @@
   const bare = params.has("bare");
   if (bare) document.body.classList.add("bare");
 
-  // ---------- fit the phone to the window ----------
+  // ---------- fit the phone (and the Back/Home keys under it) to the visible window ----------
   const scaleBox = $("#deviceScale");
   const device = $("#device");
+  const keys = $(".hw-keys");
+  const panelEl = $("#panel");
+  const stacked = window.matchMedia("(max-width: 900px)");
   function fit() {
     if (bare) { scaleBox.style.transform = "none"; return; }
+    const vv = window.visualViewport;
+    const vw = vv ? vv.width : window.innerWidth;
+    const vh = vv ? vv.height : window.innerHeight;
     const w = device.offsetWidth;
     const h = device.offsetHeight;
-    const narrow = window.innerWidth <= 900;
-    const availH = narrow ? Infinity : window.innerHeight - 32;
-    const availW = window.innerWidth - 32;
-    const s = Math.min(1, availH / h, availW / w);
+    const pad = 16;                                         // .stage padding
+    const keysH = keys ? keys.offsetHeight + 12 : 0;        // keys row + its margin-top
+    const sideW = stacked.matches ? 0 : panelEl.offsetWidth + 28;   // panel + gap when side by side
+    const availW = vw - 2 * pad - sideW;
+    const availH = vh - 2 * pad - keysH;
+    const s = Math.max(0.25, Math.min(1, availW / w, availH / h));
     scaleBox.style.transform = `scale(${s})`;
     scaleBox.style.width = w * s + "px";
     scaleBox.style.height = h * s + "px";
   }
   window.addEventListener("resize", fit);
+  window.addEventListener("orientationchange", fit);
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", fit);
+  if (stacked.addEventListener) stacked.addEventListener("change", fit);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
   fit();
 
   // ---------- status bar clock ----------
